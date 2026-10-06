@@ -7,6 +7,8 @@ export default defineConfig([
   ...nextTs,
   globalIgnores([
     ".next/**",
+    ".open-next/**",
+    ".wrangler/**",
     "out/**",
     "design-reference/**",
     "public/maplibre-gl-worker.mjs",

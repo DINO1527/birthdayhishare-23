@@ -16,7 +16,7 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-Before Vercel deployment, run:
+Before deployment, run:
 
 ```bash
 npm run lint
@@ -45,7 +45,7 @@ The site includes the story photographs and map coordinates. It runs without opt
 
 ### Photos
 
-Story photos now live in `private/images`, outside Next.js's public folder. The entrance preloads all 24 optimized photos after the questions are answered, then opens the story. See `IMAGE-ASSET-GUIDE.md` for photo names and ratios. Keep replacement photos under the matching `private/images` folder, and optimize large files before deployment.
+Story photos live in `private/images`, outside Next.js's public folder. The entrance preloads all 24 optimized photos after the questions are answered, then opens the story. See `IMAGE-ASSET-GUIDE.md` for photo names and ratios. Keep replacement photos under the matching `private/images` folder, and optimize large files before deployment. The Cloudflare build copies them into Worker static assets under a protected path; see `CLOUDFLARE-DEPLOY.md`.
 
 The original, uncompressed photos are retained locally under ignored `private/originals` for backup. Do not upload that folder. `scripts/prepare-private-images.mjs` can process newly added WebP photos from `public/images`; verify that it removed every public copy afterward.
 
