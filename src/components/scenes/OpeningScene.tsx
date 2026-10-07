@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
+import { BotanicalBackdrop } from "@/components/ui/BotanicalBackdrop";
 import { Envelope3D } from "@/components/three/Envelope3D";
 import { entranceQuestions, journeyLocations, memories, loveReasons } from "@/data/story";
 import { ScrollTrigger } from "@/lib/animation";
@@ -99,8 +100,8 @@ export function OpeningScene() {
 
     if (location.hash) history.replaceState(null, "", `${location.pathname}${location.search}`);
     window.scrollTo(0, 0);
-    const stop = (event: Event) => event.preventDefault();
-    const stopKey = (event: KeyboardEvent) => { if (blockedKeys.has(event.key)) event.preventDefault(); };
+    const stop = (event: Event) => { if (!(event.target instanceof Element && event.target.closest("input, .question-card, .music-panel"))) event.preventDefault(); };
+    const stopKey = (event: KeyboardEvent) => { if (blockedKeys.has(event.key) && !(event.target instanceof Element && event.target.closest("input, button"))) event.preventDefault(); };
     const keepAtTop = () => window.scrollTo(0, 0);
     window.addEventListener("wheel", stop, { passive: false });
     window.addEventListener("touchmove", stop, { passive: false });
@@ -161,40 +162,19 @@ export function OpeningScene() {
     }, 850);
   }
 
-  async function resetEntrance() {
-    await fetch("/api/story-session", { method: "DELETE", cache: "no-store" });
-    document.body.classList.remove("story-ready");
-    window.dispatchEvent(new Event("birthday-story-ready-change"));
-    setQuestionIndex(0);
-    setAnswer("");
-    setFeedback("");
-    setSuccess(false);
-    setLoaded(0);
-    setFailed(0);
-    setPhase("sealed");
-    window.scrollTo({ top: 0 });
-  }
-
   return (
     <section className={`scene opening-scene phase-${phase}`} data-scene="1" id="opening">
-      <div className="opening-atmosphere" aria-hidden="true"><span /><span /><span /></div>
-      <div className="opening-particles" aria-hidden="true">{Array.from({ length: 9 }).map((_, index) => <i key={index} />)}</div>
-      <div className="opening-florals" aria-hidden="true">
-        {Array.from({ length: 8 }).map((_, index) => <span className={`opening-floral ${index % 3 === 0 ? "is-flower" : "is-leaf"}`} key={index}>
-          {index % 3 === 0 ? <svg viewBox="0 0 100 100" fill="none"><g fill="#f8e8df" stroke="#e9cfc5" strokeWidth="1.5">{Array.from({ length: 5 }).map((__, petal) => <ellipse key={petal} cx="50" cy="26" rx="13" ry="24" transform={`rotate(${petal * 72} 50 50)`} />)}</g><circle cx="50" cy="50" r="12" fill="#c9a37d" /><circle cx="50" cy="50" r="5" fill="#e6caa2" /></svg>
-            : <svg viewBox="0 0 100 100" fill="none"><path d="M17 78C18 35 58 12 83 19c4 37-23 63-66 59Z" fill="#b7bca6" stroke="#8e9b82" strokeWidth="2" /><path d="M17 78c20-23 41-41 66-59" stroke="#829178" strokeWidth="2" strokeLinecap="round" /></svg>}
-        </span>)}
-      </div>
+      <BotanicalBackdrop />
       <div className="opening-copy">
         <p className="eyebrow">01 / FOR YOU</p>
         <h1>For You</h1>
         <p>A small piece of our story.</p>
       </div>
       <div className="envelope-stage" aria-hidden="true">
-        <Canvas camera={{ position: [0, 0.22, 6.9], fov: 36 }} dpr={[1, 1.55]} shadows>
+        <Canvas camera={{ position: [0, 0.65, 7.8], fov: 36 }} dpr={[1, 1.55]} shadows>
           <ambientLight intensity={1.2} />
           <directionalLight position={[4, 6, 6]} intensity={1.8} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005} />
-          <Envelope3D stage={phase === "checking" ? "sealed" : phase} progress={loadingProgress} />
+          <Envelope3D stage={phase === "checking" ? "sealed" : phase} />
           <ContactShadows position={[0, -1.55, 0]} opacity={0.16} scale={7} blur={2.4} />
         </Canvas>
       </div>
@@ -214,8 +194,8 @@ export function OpeningScene() {
         </div>
       )}
       {phase === "unlocking" && <p className="opening-status" role="status">Our story is opening…</p>}
-      {phase === "loading" && <div className="story-loading" role="status" aria-live="polite"><p className="eyebrow">OUR STORY IS UNFOLDING</p><p>{failed ? `${failed} photographs could not load. Please try again.` : `${Math.round(loadingProgress * 100)}% of our memories are ready`}</p>{failed > 0 && <div className="story-loading-actions"><button type="button" onClick={() => { setFailed(0); setLoaded(0); setLoadAttempt((value) => value + 1); }}>Retry photos</button><button type="button" onClick={revealStory}>Continue anyway</button></div>}</div>}
-      {phase === "unlocked" && <div className="entrance-unlocked-note"><span>THE STORY IS UNLOCKED</span><button type="button" onClick={resetEntrance}>Reset private entrance</button></div>}
+      {phase === "loading" && <div className="story-loading" role="status" aria-live="polite"><p className="eyebrow">OUR STORY IS UNFOLDING</p><div className="memory-loading-track" role="progressbar" aria-label="Loading memories" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(loadingProgress * 100)}><span style={{ transform: `scaleX(${loadingProgress})` }} /></div><p>{failed ? `${failed} photographs could not load. Please try again.` : `${Math.round(loadingProgress * 100)}% of our memories are ready`}</p>{failed > 0 && <div className="story-loading-actions"><button type="button" onClick={() => { setFailed(0); setLoaded(0); setLoadAttempt((value) => value + 1); }}>Retry photos</button><button type="button" onClick={revealStory}>Continue anyway</button></div>}</div>}
+      {phase === "unlocked" && <div className="entrance-unlocked-note"><a href="#hero">Our story begins <span aria-hidden="true">↓</span></a></div>}
     </section>
   );
 }

@@ -10,8 +10,11 @@ import { FinalScene } from "@/components/scenes/FinalScene";
 import { SceneProgress } from "@/components/ui/SceneProgress";
 import { SceneLandingTransitions } from "@/components/ui/SceneLandingTransitions";
 import { MusicButton } from "@/components/ui/MusicButton";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 export default function Home() {
+  const hasVoice = existsSync(join(process.cwd(), "public/audio/voice-message.mp3"));
   return (
     <main>
       <SceneLandingTransitions />
@@ -23,7 +26,7 @@ export default function Home() {
       <TimelineScene />
       <MemoriesScene />
       <LoveReasonsScene />
-      <VoiceScene />
+      <VoiceScene source={hasVoice ? "/audio/voice-message.mp3" : "/audio/voice-preview.wav"} sample={!hasVoice} />
       <LetterScene />
       <FinalScene />
     </main>

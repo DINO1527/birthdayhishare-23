@@ -7,6 +7,10 @@ export function SceneProgress() {
   const [current, setCurrent] = useState(1);
 
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent("birthday-scene-change", { detail: current }));
+  }, [current]);
+
+  useEffect(() => {
     const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-scene]"));
     if (!sections.length) return;
     let frame = 0;

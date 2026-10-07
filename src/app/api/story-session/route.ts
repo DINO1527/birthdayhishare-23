@@ -14,7 +14,10 @@ function attemptKey(request: NextRequest) {
 
 function sameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
-  return !origin || origin === request.nextUrl.origin;
+  // Next may normalize nextUrl's hostname to localhost behind a local or edge
+  // server. Validate against the actual request host, retaining scheme and port.
+  const host = request.headers.get("host");
+  return !origin || origin === (host ? `${request.nextUrl.protocol}//${host}` : request.nextUrl.origin);
 }
 
 export function GET(request: NextRequest) {

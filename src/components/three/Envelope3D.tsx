@@ -51,10 +51,10 @@ function drawSeal(canvas: HTMLCanvasElement) {
   context.fillText("D & H", 256, 264);
 }
 
-function drawLetter(canvas: HTMLCanvasElement, percent: number) {
+function drawLetter(canvas: HTMLCanvasElement) {
   const context = canvas.getContext("2d");
   if (!context) return;
-  const amount = Math.max(0, Math.min(100, percent));
+
   context.clearRect(0, 0, 1024, 620);
   context.textAlign = "center";
   context.textBaseline = "middle";
@@ -73,18 +73,16 @@ function drawLetter(canvas: HTMLCanvasElement, percent: number) {
     context.stroke();
   }
   context.fillStyle = "#713039";
-  context.font = "bold 108px Georgia, serif";
-  context.fillText(`${amount}%`, 512, 310);
+  context.font = "italic 46px Georgia, serif";
+  context.fillText("For all our tomorrows", 512, 310);
   context.fillStyle = "#a48a7c";
   context.font = "25px Arial, sans-serif";
-  context.fillText("GATHERING OUR MEMORIES", 512, 385);
+  context.fillText("WITH ALL MY LOVE", 512, 385);
   context.fillStyle = "#e4d6c9";
   context.fillRect(245, 423, 534, 7);
-  context.fillStyle = "#713039";
-  context.fillRect(245, 423, 534 * amount / 100, 7);
 }
 
-export function Envelope3D({ stage, progress = 0 }: { stage: EnvelopeStage; progress?: number }) {
+export function Envelope3D({ stage }: { stage: EnvelopeStage }) {
   const reducedMotion = useReducedMotion();
   const group = useRef<THREE.Group>(null);
   const flap = useRef<THREE.Group>(null);
@@ -93,8 +91,6 @@ export function Envelope3D({ stage, progress = 0 }: { stage: EnvelopeStage; prog
   const sealLeft = useRef<THREE.Group>(null);
   const sealRight = useRef<THREE.Group>(null);
   const openingTime = useRef(0);
-  const shownProgress = useRef(0);
-  const paintedProgress = useRef(-1);
   const letterCanvas = useRef<HTMLCanvasElement | null>(null);
   const letterTexture = useRef<THREE.CanvasTexture | null>(null);
   const letterMaterial = useRef<THREE.MeshBasicMaterial>(null);
@@ -111,7 +107,7 @@ export function Envelope3D({ stage, progress = 0 }: { stage: EnvelopeStage; prog
     letter.width = 1024;
     letter.height = 620;
     letterCanvas.current = letter;
-    drawLetter(letter, 0);
+    drawLetter(letter);
     const ink = makeTexture(letter);
 
     letterTexture.current = ink;
@@ -135,16 +131,8 @@ export function Envelope3D({ stage, progress = 0 }: { stage: EnvelopeStage; prog
   useFrame((state, delta) => {
     if (!group.current || !flap.current || !card.current || !letterFold.current || !sealLeft.current || !sealRight.current) return;
 
-    const targetPercent = Math.round(progress * 100);
-    shownProgress.current = targetPercent === 0 || reducedMotion ? targetPercent : THREE.MathUtils.damp(shownProgress.current, targetPercent, 2.2, delta);
-    const visiblePercent = Math.round(shownProgress.current);
-    if (visiblePercent !== paintedProgress.current && letterCanvas.current && letterTexture.current) {
-      drawLetter(letterCanvas.current, visiblePercent);
-      letterTexture.current.needsUpdate = true;
-      paintedProgress.current = visiblePercent;
-    }
-
     const t = state.clock.elapsedTime;
+    group.current.scale.setScalar(Math.min(1, state.viewport.width / 3.95));
     group.current.position.y = reducedMotion ? 0 : Math.sin(t * 0.8) * 0.07;
     group.current.rotation.y = -0.09 + (reducedMotion ? 0 : Math.sin(t * 0.45) * 0.055);
     group.current.rotation.x = 0.06 + (reducedMotion ? 0 : Math.sin(t * 0.35) * 0.018);
@@ -159,7 +147,8 @@ export function Envelope3D({ stage, progress = 0 }: { stage: EnvelopeStage; prog
 
     flap.current.rotation.x = 2.72 * lift;
     card.current.position.y = 1.12 * reveal;
-    card.current.position.z = 0.08 * reveal;
+    // The letter slides vertically inside the pocket, never through its front folds.
+    card.current.position.z = 0;
     letterFold.current.rotation.x = 2.9 * unfold;
 
     for (const [piece, direction] of [[sealLeft.current, -1], [sealRight.current, 1]] as const) {
@@ -205,15 +194,15 @@ export function Envelope3D({ stage, progress = 0 }: { stage: EnvelopeStage; prog
         </group>
       </group>
 
-      <mesh castShadow receiveShadow position={[0, 0, 0.09]}>
+      <mesh castShadow receiveShadow position={[0, 0, 0.12]}>
         <shapeGeometry args={[leftFold]} />
         <meshStandardMaterial color="#e9dac5" {...paper} />
       </mesh>
-      <mesh castShadow receiveShadow position={[0, 0, 0.105]}>
+      <mesh castShadow receiveShadow position={[0, 0, 0.135]}>
         <shapeGeometry args={[rightFold]} />
         <meshStandardMaterial color="#e5d4bc" {...paper} />
       </mesh>
-      <mesh castShadow receiveShadow position={[0, 0, 0.14]}>
+      <mesh castShadow receiveShadow position={[0, 0, 0.16]}>
         <shapeGeometry args={[bottomFold]} />
         <meshStandardMaterial color="#f2e6d4" {...paper} />
       </mesh>
