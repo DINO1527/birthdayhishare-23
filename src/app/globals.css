@@ -205,11 +205,31 @@ h2 {
 .opening-particles i:nth-child(8) { left: 64%; top: 39%; animation-delay: -4s; scale: .52; }
 .opening-particles i:nth-child(9) { left: 91%; top: 82%; animation-delay: -8s; scale: .8; }
 @keyframes dustFloat { to { transform: translate3d(28px,-46px,0) rotate(34deg); opacity: .3; } }
+.opening-atmosphere, .opening-florals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.opening-atmosphere { z-index: 0; }
+.opening-atmosphere span { position: absolute; display: block; width: 38vw; aspect-ratio: 1; border-radius: 50%; filter: blur(55px); opacity: .5; animation: atmosphereDrift 18s ease-in-out infinite alternate; }
+.opening-atmosphere span:nth-child(1) { left: -13%; top: 17%; background: #e1c8c2; }
+.opening-atmosphere span:nth-child(2) { right: -14%; top: 44%; background: #d5dfcb; animation-delay: -7s; }
+.opening-atmosphere span:nth-child(3) { left: 37%; bottom: -23%; background: #e9d6bd; animation-delay: -12s; }
+@keyframes atmosphereDrift { to { transform: translate3d(8vw,-6vh,0) scale(1.2); opacity: .3; } }
+.opening-florals { z-index: 3; }
+.opening-floral { position: absolute; display: block; width: var(--size); aspect-ratio: 1; opacity: var(--opacity); filter: blur(var(--blur)) drop-shadow(0 8px 12px rgba(71,54,45,.13)); animation: floralDrift var(--duration) ease-in-out infinite alternate; animation-delay: var(--delay); }
+.opening-floral svg { display: block; width: 100%; height: 100%; }
+.opening-floral:nth-child(1) { --size: 80px; --opacity: .7; --blur: 1px; --duration: 12s; --delay: -3s; left: 9%; top: 30%; transform: rotate(-15deg); }
+.opening-floral:nth-child(2) { --size: 48px; --opacity: .52; --blur: 2px; --duration: 14s; --delay: -9s; left: 23%; top: 65%; }
+.opening-floral:nth-child(3) { --size: 95px; --opacity: .32; --blur: 5px; --duration: 16s; --delay: -6s; right: 8%; top: 21%; }
+.opening-floral:nth-child(4) { --size: 60px; --opacity: .52; --blur: 2px; --duration: 15s; --delay: -11s; right: 14%; top: 64%; }
+.opening-floral:nth-child(5) { --size: 140px; --opacity: .26; --blur: 8px; --duration: 18s; --delay: -4s; left: -3%; bottom: 3%; }
+.opening-floral:nth-child(6) { --size: 45px; --opacity: .58; --blur: 1px; --duration: 13s; --delay: -8s; right: 28%; top: 11%; }
+.opening-floral:nth-child(7) { --size: 120px; --opacity: .23; --blur: 7px; --duration: 19s; --delay: -13s; right: -2%; bottom: 2%; }
+.opening-floral:nth-child(8) { --size: 58px; --opacity: .48; --blur: 2px; --duration: 14s; --delay: -2s; left: 42%; bottom: 5%; }
+@keyframes floralDrift { to { translate: 24px -34px; rotate: 28deg; opacity: .28; } }
 .envelope-stage { position: relative; z-index: 2; transition: transform 1.2s cubic-bezier(.2,.75,.2,1), filter 1s ease, opacity .9s ease; }
 .entrance-open { position: relative; z-index: 5; transition: opacity .45s ease, transform .45s ease; }
-.phase-question .opening-copy, .phase-unlocking .opening-copy { opacity: .14; transform: translateY(-14px); filter: blur(5px); }
-.phase-question .envelope-stage, .phase-unlocking .envelope-stage { transform: scale(1.08) translateY(1.5rem); filter: blur(3px); opacity: .68; }
-.phase-unlocking .envelope-stage { transform: scale(1.18) translateY(1rem); opacity: .42; }
+.phase-question .opening-copy { opacity: .14; transform: translateY(-14px); filter: blur(5px); }
+.phase-question .envelope-stage { transform: scale(1.08) translateY(1.5rem); filter: blur(3px); opacity: .68; }
+.phase-unlocking .opening-copy, .phase-loading .opening-copy { opacity: .34; transform: translateY(-12px); }
+.phase-unlocking .envelope-stage, .phase-loading .envelope-stage { transform: scale(1.08) translateY(.5rem); }
 .question-card {
   position: absolute; z-index: 12; left: 50%; top: 53%; translate: -50% -50%; width: min(560px, calc(100% - 2rem));
   min-height: 300px; display: grid; place-items: center; padding: clamp(2rem, 6vw, 4.5rem);
@@ -464,12 +484,9 @@ h2 {
 /* 08 — LETTER */
 .letter-scene { background: #e6e3db; display: grid; place-items: center; }
 .letter-paper { position: relative; width: min(900px, 100%); min-height: 82svh; background: #f8f6f0; padding: clamp(2rem, 7vw, 7rem); box-shadow: 0 45px 100px rgba(26,22,18,.12); }
-.story-loading { position: absolute; z-index: 20; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background: rgba(241,240,236,.96); backdrop-filter: blur(20px); }
-.story-loading h2 { font-size: clamp(3.5rem, 9vw, 7rem); }
-.story-loading > p:not(.eyebrow) { color: var(--muted); text-align: center; line-height: 1.6; }
-.story-loading-track { width: min(320px, 80vw); height: 3px; margin: 1rem 0; background: var(--soft); overflow: hidden; }
-.story-loading-track span { display: block; height: 100%; background: var(--burgundy); transition: width .25s ease; }
-.story-loading small { color: var(--muted); letter-spacing: .16em; }
+.story-loading, .opening-status { position: relative; z-index: 5; align-self: start; margin: -1.2rem 0 1.5rem; text-align: center; }
+.story-loading .eyebrow { margin-bottom: .4rem; color: var(--burgundy); }
+.story-loading > p:last-of-type, .opening-status { color: var(--muted); font-family: var(--serif); font-size: 1.08rem; font-style: italic; line-height: 1.5; }
 .story-loading-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; margin-top: 1.5rem; }
 .story-loading-actions button { border: 1px solid var(--ink); border-radius: 999px; padding: .8rem 1.2rem; background: var(--ink); color: white; cursor: pointer; }
 .story-loading-actions button + button { background: transparent; color: var(--ink); }
@@ -548,7 +565,12 @@ h2 {
   .opening-copy h1 { font-size: clamp(5rem, 25vw, 8rem); }
   .envelope-stage { height: 46svh; }
   .opening-scene { grid-template-rows: auto 1fr auto; padding-inline: 1rem; }
-  .phase-question .opening-copy, .phase-unlocking .opening-copy { opacity: .08; }
+  .phase-question .opening-copy { opacity: .08; }
+  .opening-floral:nth-child(3), .opening-floral:nth-child(5), .opening-floral:nth-child(7) { display: none; }
+  .opening-floral:nth-child(1) { --size: 54px; left: 2%; }
+  .opening-floral:nth-child(4) { --size: 44px; right: 2%; }
+  .opening-floral:nth-child(6) { --size: 32px; right: 8%; }
+  .story-loading, .opening-status { margin-top: -.4rem; }
   .question-card { top: 52%; min-height: 330px; padding: 2rem 1.35rem; }
   .question-card label { font-size: clamp(2rem, 10vw, 3rem); }
   .entrance-unlocked-note { margin-top: -1rem; }

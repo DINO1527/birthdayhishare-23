@@ -31,6 +31,7 @@ export function OpeningScene() {
   const inputRef = useRef<HTMLInputElement>(null);
   const isLocked = phase !== "unlocked";
   const question = entranceQuestions[questionIndex];
+  const loadingProgress = loaded / photos.length;
 
   useEffect(() => {
     let cancelled = false;
@@ -67,6 +68,8 @@ export function OpeningScene() {
     let cancelled = false;
     let count = 0;
     let errors = 0;
+    const started = performance.now();
+    let revealTimer: number | undefined;
     const loadPhoto = (src: string) => new Promise<void>((resolve) => {
       const image = new window.Image();
       image.onload = () => { if (!cancelled) setLoaded(++count); resolve(); };
@@ -79,9 +82,11 @@ export function OpeningScene() {
         if (cancelled) return;
       }
       if (errors) setFailed(errors);
-      else window.setTimeout(() => { if (!cancelled) revealStory(); }, 350);
+      else revealTimer = window.setTimeout(() => {
+        if (!cancelled) revealStory();
+      }, Math.max(400, 2800 - (performance.now() - started)));
     })();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; window.clearTimeout(revealTimer); };
   }, [phase, loadAttempt, revealStory]);
 
   useEffect(() => {
@@ -152,7 +157,7 @@ export function OpeningScene() {
         return;
       }
       setPhase("unlocking");
-      window.setTimeout(() => setPhase("loading"), 1200);
+      window.setTimeout(() => setPhase("loading"), 1400);
     }, 850);
   }
 
@@ -172,27 +177,31 @@ export function OpeningScene() {
 
   return (
     <section className={`scene opening-scene phase-${phase}`} data-scene="1" id="opening">
+      <div className="opening-atmosphere" aria-hidden="true"><span /><span /><span /></div>
       <div className="opening-particles" aria-hidden="true">{Array.from({ length: 9 }).map((_, index) => <i key={index} />)}</div>
+      <div className="opening-florals" aria-hidden="true">
+        {Array.from({ length: 8 }).map((_, index) => <span className={`opening-floral ${index % 3 === 0 ? "is-flower" : "is-leaf"}`} key={index}>
+          {index % 3 === 0 ? <svg viewBox="0 0 100 100" fill="none"><g fill="#f8e8df" stroke="#e9cfc5" strokeWidth="1.5">{Array.from({ length: 5 }).map((__, petal) => <ellipse key={petal} cx="50" cy="26" rx="13" ry="24" transform={`rotate(${petal * 72} 50 50)`} />)}</g><circle cx="50" cy="50" r="12" fill="#c9a37d" /><circle cx="50" cy="50" r="5" fill="#e6caa2" /></svg>
+            : <svg viewBox="0 0 100 100" fill="none"><path d="M17 78C18 35 58 12 83 19c4 37-23 63-66 59Z" fill="#b7bca6" stroke="#8e9b82" strokeWidth="2" /><path d="M17 78c20-23 41-41 66-59" stroke="#829178" strokeWidth="2" strokeLinecap="round" /></svg>}
+        </span>)}
+      </div>
       <div className="opening-copy">
         <p className="eyebrow">01 / FOR YOU</p>
         <h1>For You</h1>
         <p>A small piece of our story.</p>
       </div>
       <div className="envelope-stage" aria-hidden="true">
-        <Canvas camera={{ position: [0, 0, 6.4], fov: 34 }} dpr={[1, 1.55]}>
-          <ambientLight intensity={1.6} />
-          <directionalLight position={[4, 6, 6]} intensity={2.2} />
-          <Envelope3D stage={phase === "loading" ? "unlocking" : phase === "checking" ? "sealed" : phase} />
+        <Canvas camera={{ position: [0, 0.22, 6.9], fov: 36 }} dpr={[1, 1.55]} shadows>
+          <ambientLight intensity={1.2} />
+          <directionalLight position={[4, 6, 6]} intensity={1.8} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005} />
+          <Envelope3D stage={phase === "checking" ? "sealed" : phase} progress={loadingProgress} />
           <ContactShadows position={[0, -1.55, 0]} opacity={0.16} scale={7} blur={2.4} />
         </Canvas>
       </div>
       {phase === "sealed" && <button type="button" className="primary-pill entrance-open" onClick={beginEntrance}>Open <span aria-hidden="true">→</span></button>}
       {phase === "checking" && <p className="entrance-checking" role="status">Preparing your story…</p>}
-      {(phase === "question" || phase === "unlocking") && (
-        <div className={`question-card ${success ? "is-success" : ""} ${phase === "unlocking" ? "is-unlocking" : ""}`}>
-          {phase === "unlocking" ? (
-            <div className="unlock-message" aria-live="polite"><span className="unlock-seal" aria-hidden="true">⌁</span><p className="eyebrow">PRIVATE STORY</p><h2>Unlocked.</h2><p>The rest of our story is waiting.</p></div>
-          ) : (
+      {phase === "question" && (
+        <div className={`question-card ${success ? "is-success" : ""}`}>
             <form key={`${question.id}-${shake}`} onSubmit={submitAnswer} className={feedback && !success ? "is-wrong" : ""}>
               <p className="eyebrow">PRIVATE QUESTION {String(questionIndex + 1).padStart(2, "0")} / {String(entranceQuestions.length).padStart(2, "0")}</p>
               <label htmlFor="private-answer">{question.question}</label>
@@ -202,10 +211,10 @@ export function OpeningScene() {
               </div>
               <p id="answer-feedback" className="answer-feedback" aria-live="polite">{feedback || "This is just between us."}</p>
             </form>
-          )}
         </div>
       )}
-      {phase === "loading" && <div className="story-loading" role="status" aria-live="polite"><p className="eyebrow">GATHERING OUR MEMORIES</p><h2>Almost there.</h2><p>{failed ? `${failed} photographs could not load. Please try again.` : "Preparing every photograph for our story…"}</p><div className="story-loading-track"><span style={{ width: `${(loaded / photos.length) * 100}%` }} /></div><small>{loaded} / {photos.length}</small>{failed > 0 && <div className="story-loading-actions"><button type="button" onClick={() => { setFailed(0); setLoaded(0); setLoadAttempt((value) => value + 1); }}>Retry photos</button><button type="button" onClick={revealStory}>Continue anyway</button></div>}</div>}
+      {phase === "unlocking" && <p className="opening-status" role="status">Our story is opening…</p>}
+      {phase === "loading" && <div className="story-loading" role="status" aria-live="polite"><p className="eyebrow">OUR STORY IS UNFOLDING</p><p>{failed ? `${failed} photographs could not load. Please try again.` : `${Math.round(loadingProgress * 100)}% of our memories are ready`}</p>{failed > 0 && <div className="story-loading-actions"><button type="button" onClick={() => { setFailed(0); setLoaded(0); setLoadAttempt((value) => value + 1); }}>Retry photos</button><button type="button" onClick={revealStory}>Continue anyway</button></div>}</div>}
       {phase === "unlocked" && <div className="entrance-unlocked-note"><span>THE STORY IS UNLOCKED</span><button type="button" onClick={resetEntrance}>Reset private entrance</button></div>}
     </section>
   );
