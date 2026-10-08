@@ -759,3 +759,173 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .question-card { top: 55%; min-height: 0; padding: 1rem 2rem; }
   .question-card label { font-size: 1.5rem; margin-bottom: .7rem; }
 }
+
+/* Intimate vinyl player: one floating note expands into a self-closing song chip. */
+.music-control { position: fixed; z-index: 90; top: max(.85rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); width: 56px; height: 56px; display: grid; place-items: center; }
+.music-control audio { display: none; }
+.music-float { position: relative; z-index: 3; display: grid; place-items: center; width: 52px; height: 52px; border: 1px solid #85745c55; border-radius: 50%; color: #443b33; background: #faf8f1e8; box-shadow: 0 7px 24px #36291d24; backdrop-filter: blur(16px); cursor: pointer; transition: right .65s cubic-bezier(.18,.8,.2,1), transform .65s cubic-bezier(.18,.8,.2,1), color .3s ease, background .3s ease; }
+.music-float:hover { transform: scale(1.07); }
+.music-control.is-expanded .music-float { transform:translateX(-246px); }
+.music-note { position: relative; z-index: 2; display:grid; place-items:center; width:24px; height:24px; font:1.4rem/1 Georgia,serif; }
+.music-button-cover { position:absolute; inset:3px; z-index:2; width:calc(100% - 6px); height:calc(100% - 6px); border-radius:50%; object-fit:cover; opacity:0; transform:scale(.72); transition:opacity .32s ease,transform .55s cubic-bezier(.18,.8,.2,1); }
+.music-control.is-expanded .music-button-cover { opacity:1; transform:scale(1); transition-delay:.34s; }
+.music-control.is-expanded.is-playing .music-button-cover { animation:albumSpin 8s linear .9s infinite; }
+@keyframes albumSpin { to { transform:translate(-50%,-50%) scale(1) rotate(360deg); } }
+.music-control.is-expanded .music-note { opacity:0; transition:opacity .2s ease .22s; }
+.music-wave { display:flex; align-items:center; justify-content:center; gap:2px; width:20px; height:18px; }
+.music-wave i { display:block; width:2.5px; height:5px; border-radius:3px; background:currentColor; transform:scaleY(.6); }
+.music-wave i:nth-child(2),.music-wave i:nth-child(4) { height:10px; }
+.music-wave i:nth-child(3) { height:15px; }
+.music-float.is-playing .music-wave i { animation:musicWave .72s ease-in-out infinite alternate; }
+.music-float.is-playing .music-wave i:nth-child(2) { animation-delay:-.24s; }
+.music-float.is-playing .music-wave i:nth-child(3) { animation-delay:-.48s; }
+.music-float.is-playing .music-wave i:nth-child(4) { animation-delay:-.34s; }
+.music-float.is-playing .music-wave i:nth-child(5) { animation-delay:-.12s; }
+@keyframes musicWave { to { transform:scaleY(.38); } }
+.music-pulse { position: absolute; inset: -3px; border: 1px solid #ab8e6650; border-radius: inherit; opacity: 0; transform: scale(.94); }
+.music-float.is-playing .music-pulse { animation: songRipple 2.5s ease-out infinite; }
+.music-float.is-playing .music-pulse::after { content:""; position:absolute; inset:-6px; border:1px solid #ab8e662c; border-radius:inherit; animation:songRipple 2.5s ease-out .8s infinite; }
+@keyframes songRipple { 0% { transform:scale(.93); opacity:.7; } 100% { transform:scale(1.6); opacity:0; } }
+.music-card { position:absolute; right:-.25rem; top:0; display:flex; align-items:center; gap:.7rem; width:52px; height:52px; padding:0; overflow:hidden; border:1px solid transparent; border-radius:32px; opacity:0; pointer-events:none; transform:scale(.82); transform-origin:right center; background:#faf8f2f5; box-shadow:0 16px 52px #372d2830; backdrop-filter:blur(22px); transition:width .62s cubic-bezier(.18,.8,.2,1),height .45s ease,padding .4s ease,opacity .25s ease,transform .5s cubic-bezier(.18,.8,.2,1),border-color .35s ease; }
+.music-control.is-expanded .music-card { width:min(308px,calc(100vw - 2rem)); height:68px; padding:.45rem 3.55rem .45rem .65rem; border-color:#fff9; opacity:1; pointer-events:auto; transform:scale(1); }
+@keyframes vinylTurn { to { transform:rotate(360deg); } }
+.music-details { min-width:0; display:grid; gap:.24rem; opacity:0; transform:translateX(10px); transition:opacity .35s .1s ease,transform .4s .08s ease; }
+.music-control.is-expanded .music-details { opacity:1; transform:translateX(0); animation:musicDetailsHandoff 1.2s ease .55s both; }
+@keyframes musicDetailsHandoff { 0%,10% { opacity:0; transform:translateX(10px); } 38%,66% { opacity:1; transform:translateX(0); } 100% { opacity:0; transform:translateX(-8px); } }
+.music-details strong { overflow:hidden; color:#332d27; font:1.16rem/1.05 var(--serif); white-space:nowrap; text-overflow:ellipsis; }
+.music-details span { color:#796d5f; font-size:.56rem; letter-spacing:.045em; white-space:nowrap; }
+.music-play-toggle { position:absolute; right:.48rem; top:50%; translate:0 -50%; width:34px; height:34px; display:grid; place-items:center; border:1px solid #6c51422b; border-radius:50%; background:#fffaf48c; color:#43362f; font-size:.7rem; cursor:pointer; opacity:0; transition:opacity .2s ease,background .2s ease; }
+.music-control.is-expanded .music-play-toggle { opacity:1; transition-delay:.15s; }
+.music-control.is-expanded .music-details { justify-items:center; text-align:center; }
+.music-control.is-expanded .music-lyrics-window p { text-align:center; }
+.music-lyrics { position:absolute; right:3.2rem; top:50%; width:0; height:46px; overflow:hidden; opacity:0; transform:translateY(-50%) translateX(8px); color:#44362f; transition:width .42s ease,opacity .3s ease,transform .42s ease; }
+.music-control.is-expanded .music-lyrics { width:144px; opacity:1; transform:translateY(-50%) translateX(0); transition-delay:1.35s; }
+.music-lyrics-window { position:absolute; inset:0; display:grid; place-items:center; overflow:hidden; opacity:0; }
+.music-control.is-expanded .music-lyrics-window { animation:lyricWindowReveal .55s ease 2s both; }
+@keyframes lyricWindowReveal { to { opacity:1; } }
+.music-lyrics-window p { position:absolute; width:100%; margin:0; overflow:hidden; color:#665b50; font-size:.65rem; line-height:1.35; white-space:nowrap; text-overflow:ellipsis; opacity:0; transform:translateY(12px) rotateX(-28deg); transition:opacity .35s ease,transform .5s cubic-bezier(.2,.75,.2,1); }
+.music-lyrics-window p.is-current { opacity:1; color:#54383a; font-family:var(--serif); font-size:.82rem; transform:translateY(0) rotateX(0); animation:lyricTurn .5s cubic-bezier(.2,.75,.2,1) both; }
+@keyframes lyricTurn { from { opacity:0; transform:translateY(12px) rotateX(-28deg); } to { opacity:1; transform:translateY(0) rotateX(0); } }
+.music-error { position:absolute; right:2.4rem; bottom:-1.35rem; color:#5c4541; font-size:.62rem; white-space:nowrap; }
+.music-control:focus-within .music-float:focus-visible { outline:2px solid var(--burgundy); outline-offset:4px; }
+
+/* Page 05 — drifting keepsakes under a soft floral, dappled background. */
+.memories-scene { background:#efede7; }
+.memories-scene .section-heading { position:relative; z-index:2; }
+.memories-scene .botanical-backdrop { z-index:0; opacity:.82; }
+.memories-scene .opening-atmosphere span { opacity:.55; }
+.memories-scene .opening-floral:nth-child(1) { left:6%; top:24%; }
+.memories-scene .opening-floral:nth-child(2) { left:45%; top:14%; }
+.memories-scene .opening-floral:nth-child(3) { right:5%; top:40%; }
+.memories-scene .opening-floral:nth-child(4) { right:12%; top:72%; }
+.memories-scene .memory-cloud { position:relative; z-index:2; }
+.memory-card { will-change:transform; transition:box-shadow .55s ease,filter .55s ease; }
+.memory-card:hover { z-index:3; filter:saturate(1.04); box-shadow:0 38px 90px #211b1533; }
+.memory-card .story-image { transition:border-radius .7s ease; }
+.memories-scene .garden-shadow { opacity:.09; }
+
+/* Page 08 — one folded, ruled sheet with a flowing handwritten letter. */
+.letter-scene { height:100svh; min-height:100svh; padding:4rem clamp(1.15rem,5vw,4rem); background:radial-gradient(ellipse at 18% 20%,#fffdf5 0,transparent 54%),#e6e1d7; }
+.letter-scene .botanical-backdrop { opacity:.28; }
+.letter-paper { width:min(880px,100%); height:min(82svh,790px); min-height:0; padding:clamp(1.4rem,4.2vh,3rem) clamp(1.5rem,7vw,6rem); overflow:hidden; border:1px solid #e8e0d2; border-radius:2px 8px 5px 3px; background:linear-gradient(90deg,transparent 0 3.2rem,#ca99944a 3.22rem,#ca99944a 3.28rem,transparent 3.3rem),repeating-linear-gradient(180deg,#fcfaf4 0,#fcfaf4 39px,#e8e1d6 40px,#fcfaf4 41px); box-shadow:0 3px 4px #45341c12,0 20px 55px #3326191c,4px 6px 0 #d4ccbe; transform:rotate(-.3deg); }
+.letter-paper::after { display:none; }
+.letter-paper::before { content:""; position:absolute; inset:0; border:1px solid #fff9; pointer-events:none; }
+.letter-paper>.eyebrow { margin:0 0 clamp(.7rem,2vh,1.2rem); color:#8a7770; font-size:.6rem; }
+.letter-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:.6rem; border-bottom:1px solid #b59c7950; }
+.letter-heading h2 { margin:0; color:#54383a; font-size:clamp(3.2rem,9vh,6.2rem); line-height:.95; font-style:italic; }
+.letter-stamp { display:grid; place-items:center; width:clamp(42px,7vh,62px); aspect-ratio:1; border:1px solid #a879735c; border-radius:50%; color:#905959; font:1.7rem Georgia,serif; box-shadow:inset 0 0 0 4px #fcfaf477,inset 0 0 0 5px #a8797338; }
+.letter-copy { width:min(670px,100%); margin:clamp(.7rem,2vh,1.35rem) auto 0; color:#403831; font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive; font-size:clamp(.93rem,2.1vh,1.18rem); line-height:1.9; }
+.letter-paragraph { margin:0; }
+.letter-paragraph strong { color:#51383a; font-size:1.08em; font-weight:600; }
+.letter-signature { margin-top:clamp(.5rem,1.5vh,1rem); text-align:right; color:#693e43; font-size:clamp(1.45rem,3vh,1.9rem); line-height:1.2; font-style:italic; }
+.letter-signature span { color:#9c6262; }
+.letter-scene .letter-paragraph { will-change:opacity,transform; }
+
+/* Page 09 — keep the keepsake and birthday wish in one viewport. */
+.final-scene { height:100svh; min-height:100svh; padding:max(4.5rem,calc(env(safe-area-inset-top) + 3.5rem)) 1.15rem max(1rem,env(safe-area-inset-bottom)); }
+.final-content { width:min(720px,100%); max-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(.28rem,1.05svh,.7rem); }
+.final-content>.eyebrow { margin:0; font-size:.58rem; }
+.final-content h2 { margin:0; font-size:clamp(1.8rem,4.5vh,3.35rem); line-height:1.04; letter-spacing:-.035em; }
+.final-kicker { margin:0; font-size:.57rem; line-height:1.6; letter-spacing:.2em; }
+.final-photo { position:relative; flex:0 1 auto; width:clamp(142px,26svh,248px); max-height:27svh; aspect-ratio:1; margin:clamp(.35rem,1.1svh,.8rem) auto; padding:8px; overflow:hidden; border:0; border-radius:43% 45% 42% 40% / 39% 42% 44% 46%; background:linear-gradient(145deg,#fffdf3,#ddc99e 55%,#fff); box-shadow:0 2px 0 #fff9,0 14px 34px #0007,0 34px 70px #0005; transform:rotate(-3.5deg) perspective(800px) rotateY(-5deg); transition:transform .75s cubic-bezier(.2,.8,.2,1),box-shadow .75s ease; }
+.final-photo:hover { transform:rotate(-1deg) perspective(800px) rotateY(0) translateY(-3px); box-shadow:0 2px 0 #fff9,0 20px 42px #0008,0 40px 85px #0006; }
+.final-photo>img { border:5px solid #fffdf6; border-radius:inherit; }
+.final-photo::after { content:""; position:absolute; z-index:2; inset:7px; border:1px solid #fff9; border-radius:inherit; pointer-events:none; }
+.final-content h3 { margin:.05rem 0; font-size:clamp(2rem,5.8vh,4rem); line-height:.9; }
+.final-button { min-height:44px; margin:.15rem 0 0; padding:.7rem 1.25rem; }
+.final-stars { background-size:210px 210px,270px 270px,190px 190px,310px 310px; }
+@media (max-height:700px) {
+  .final-scene { padding-block:max(3.6rem,calc(env(safe-area-inset-top) + 2.8rem)) max(.55rem,env(safe-area-inset-bottom)); }
+  .final-content { gap:.22rem; }
+  .final-content h2 { font-size:clamp(1.65rem,4vh,2.6rem); }
+  .final-photo { width:clamp(112px,22vh,175px); max-height:23vh; margin:.15rem auto; }
+  .final-content h3 { font-size:clamp(1.8rem,4.5vh,2.6rem); }
+  .final-kicker { font-size:.52rem; margin:.1rem 0; }
+}
+@media (max-width:560px) {
+  .music-control.is-expanded .music-card { width:min(292px,calc(100vw - 2rem)); }
+  .music-control.is-expanded .music-float { transform:translateX(-230px); }
+  .music-control.is-expanded .music-card { width:min(292px,calc(100vw - 2rem)); }
+  .music-control.is-expanded .music-lyrics { width:126px; right:3rem; }
+  .letter-scene { padding:4.8rem 1rem 1.2rem; }
+  .letter-paper { width:100%; height:calc(100svh - 6.2rem); padding:1.35rem 1.2rem 1.1rem; background:linear-gradient(90deg,transparent 0 1.75rem,#ca99944a 1.78rem,#ca99944a 1.83rem,transparent 1.86rem),repeating-linear-gradient(180deg,#fcfaf4 0,#fcfaf4 35px,#e8e1d6 36px,#fcfaf4 37px); }
+  .letter-paper>.eyebrow { margin-left:.65rem; font-size:.52rem; }
+  .letter-heading { margin-left:.65rem; }
+  .letter-heading h2 { font-size:clamp(2.65rem,11vw,4rem); }
+  .letter-copy { width:calc(100% - .35rem); margin:.7rem 0 0 .65rem; font-size:clamp(.82rem,3.65vw,1rem); line-height:1.78; }
+  .letter-signature { margin-top:.45rem; font-size:1.35rem; }
+  .final-content h2 { font-size:clamp(1.75rem,7vw,2.45rem); }
+  .final-photo { width:clamp(154px,24svh,216px); max-height:25svh; }
+  .final-content h3 { font-size:clamp(2rem,7.7vw,2.75rem); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .music-float.is-playing .music-pulse,.music-float.is-playing .music-pulse::after,.music-control.is-expanded.is-playing .music-button-cover,.music-float.is-playing .music-wave i,.music-lyrics-window p.is-current { animation:none; }
+  .garden-shadow,.voice-portrait { animation:none; }
+}
+
+/* Keep every expanded player element inside one aligned pill on phone widths. */
+.music-control.is-expanded .music-float { transform:translateX(calc(-1 * (min(352px,calc(100vw - 2rem)) - 64px))); }
+.music-control.is-expanded .music-card { display:grid; grid-template-columns:52px minmax(0,1fr) 34px; grid-template-rows:1fr; align-items:center; gap:.65rem; width:min(352px,calc(100vw - 2rem)); height:82px; padding:.55rem .65rem; }
+.music-control.is-expanded .music-details { grid-column:2; grid-row:1; }
+.music-control.is-expanded .music-lyrics { position:relative; grid-column:2; grid-row:1; top:auto; right:auto; width:100%; height:auto; min-width:0; transform:translateY(8px); }
+.music-control.is-expanded .music-lyrics-window { position:relative; inset:auto; height:46px; min-width:0; }
+.music-control.is-expanded .music-play-toggle { position:relative; grid-column:3; grid-row:1; top:auto; right:auto; translate:0 0; }
+@media (max-width:560px) {
+  .music-control.is-expanded .music-float { transform:translateX(calc(-1 * (min(352px,calc(100vw - 2rem)) - 64px))); }
+  .music-control.is-expanded .music-card { width:min(352px,calc(100vw - 2rem)); }
+}
+.music-control.is-expanded .music-details { animation:musicDetailsHandoff 2.2s ease .45s both; }
+@keyframes musicDetailsHandoff { 0%,12% { opacity:0; transform:translateX(10px); } 24%,70% { opacity:1; transform:translateX(0); } 100% { opacity:0; transform:translateX(-8px); } }
+.music-control.is-expanded .music-lyrics { transition-delay:2.65s; }
+.music-control.is-expanded .music-lyrics-window { animation-delay:2.7s; }
+
+/* Larger, vertically centered album art; compact the expanded capsule to its contents. */
+.music-control.is-expanded .music-float { transform:translateX(calc(-1 * (min(352px,calc(100vw - 2rem)) - 72px))) translateY(6px) scale(1.1); }
+.music-button-cover { inset:50% auto auto 50%; width:58px; height:58px; transform:translate(-50%,-50%) scale(.72); }
+.music-control.is-expanded .music-button-cover { transform:translate(-50%,-50%) scale(1); }
+.music-control.is-expanded .music-card { grid-template-columns:60px minmax(0,1fr) 34px; height:68px; padding:.3rem .55rem; }
+@media (max-width:560px) {
+  .music-control.is-expanded .music-float { transform:translateX(calc(-1 * (min(352px,calc(100vw - 2rem)) - 72px))) translateY(6px) scale(1.1); }
+}
+
+/* Page 05 — a layered garden with depth and a quiet section progress marker. */
+.memories-scene .botanical-backdrop { perspective:1200px; transform-style:preserve-3d; }
+.memories-scene .opening-atmosphere,.memories-scene .opening-florals { transform-style:preserve-3d; will-change:transform; }
+.memories-scene .opening-atmosphere span { filter:blur(65px); opacity:.48; }
+.memories-scene .opening-floral { filter:blur(var(--blur)) drop-shadow(0 18px 18px rgba(71,54,45,.2)); backface-visibility:hidden; }
+.memories-scene .memory-cloud { transform-style:preserve-3d; }
+.memories-scene .memory-card { transform-style:preserve-3d; backface-visibility:hidden; will-change:transform,opacity; transition:box-shadow .55s ease,filter .55s ease; }
+.memories-scene .memory-card .story-image { transform:translateZ(16px); box-shadow:0 14px 32px #342b2020; }
+.memories-scene .memory-card>div:last-child { transform:translateZ(28px); }
+.memories-scene .memory-card:focus-visible { outline:2px solid #765657; outline-offset:6px; }
+.memory-progress { position:fixed; z-index:30; top:50%; right:clamp(1rem,3vw,2.4rem); display:grid; justify-items:center; gap:.55rem; color:#65584b; pointer-events:none; opacity:.85; transform:translateY(-50%); animation:memoryProgressIn .45s ease both; }
+@keyframes memoryProgressIn { from { opacity:0; transform:translate(8px,-50%); } }
+.memory-progress-label { font-size:.46rem; line-height:1.55; letter-spacing:.17em; text-align:center; writing-mode:vertical-rl; rotate:180deg; }
+.memory-progress-track { position:relative; display:block; width:2px; height:76px; overflow:hidden; border-radius:2px; background:#6a5a4830; }
+.memory-progress-track i { position:absolute; inset:0; display:block; border-radius:inherit; background:#745356; transform:scaleY(0); transform-origin:top center; transition:transform .12s linear; }
+.memory-progress-count { font-size:.48rem; letter-spacing:.08em; font-variant-numeric:tabular-nums; writing-mode:vertical-rl; rotate:180deg; }
+@media (max-width:560px) {
+  .memory-progress { right:.6rem; gap:.4rem; }
+  .memory-progress-track { height:58px; }
+  .memory-progress-label,.memory-progress-count { font-size:.4rem; }
+}

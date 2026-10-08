@@ -100,7 +100,7 @@ export function OpeningScene() {
 
     if (location.hash) history.replaceState(null, "", `${location.pathname}${location.search}`);
     window.scrollTo(0, 0);
-    const stop = (event: Event) => { if (!(event.target instanceof Element && event.target.closest("input, .question-card, .music-panel"))) event.preventDefault(); };
+    const stop = (event: Event) => { if (!(event.target instanceof Element && event.target.closest("input, .question-card, .music-card"))) event.preventDefault(); };
     const stopKey = (event: KeyboardEvent) => { if (blockedKeys.has(event.key) && !(event.target instanceof Element && event.target.closest("input, button"))) event.preventDefault(); };
     const keepAtTop = () => window.scrollTo(0, 0);
     window.addEventListener("wheel", stop, { passive: false });
@@ -132,7 +132,10 @@ export function OpeningScene() {
   }, [phase, questionIndex]);
 
   function beginEntrance() {
-    if (phase === "sealed") setPhase("question");
+    if (phase === "sealed") {
+      window.dispatchEvent(new Event("birthday-story-music-start"));
+      setPhase("question");
+    }
   }
 
   async function submitAnswer(event: FormEvent) {

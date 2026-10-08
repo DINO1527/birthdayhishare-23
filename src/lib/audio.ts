@@ -9,6 +9,7 @@ export async function connectAudio(audio: HTMLAudioElement) {
   if (!graph) {
     const source = context.createMediaElementSource(audio);
     const gain = context.createGain();
+    gain.gain.value = 0;
     const analyser = context.createAnalyser();
     analyser.fftSize = 256;
     source.connect(analyser);
