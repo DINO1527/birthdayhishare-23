@@ -150,6 +150,11 @@ export function OpeningScene() {
       setShake((value) => value + 1);
       return;
     }
+    // A resumed session may enter directly at the private question, so start music
+    // from this final answer gesture as well as from the initial Open button.
+    if ((result.stage ?? 0) >= entranceQuestions.length) {
+      window.dispatchEvent(new Event("birthday-story-music-start"));
+    }
     setSuccess(true);
     setFeedback(question.successMessage);
     window.setTimeout(() => {

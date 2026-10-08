@@ -22,7 +22,8 @@ function focusLocation(map: Map, index: number, markers: HTMLElement[], animate:
     zoom: compact ? Math.min(location.zoom, 13.8) : location.zoom,
     pitch: compact ? 0 : location.transition === "mountain" ? 35 : 22,
     bearing: compact ? 0 : location.transition === "coast" ? 8 : -7,
-    padding: { top: compact ? 80 : 100, bottom: 38, left: 38, right: 38 },
+    // Equal padding keeps the active memory's marker in the visual center.
+    padding: { top: 38, bottom: 38, left: 38, right: 38 },
   };
   if (animate) map.easeTo({ ...camera, duration: 950, essential: true });
   else map.jumpTo(camera);

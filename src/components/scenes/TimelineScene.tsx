@@ -29,15 +29,20 @@ export function TimelineScene() {
             closestDistance = distance;
           }
         });
-        setActiveIndex(closest);
+        // Keep the existing focus when no stop is near the viewport; this avoids
+        // selecting a distant card during hash navigation or initial layout.
+        if (closestDistance <= window.innerHeight * 0.75) setActiveIndex(closest);
       });
     };
+    const initialUpdate = window.setTimeout(update, 120);
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
-    update();
+    window.addEventListener("hashchange", update);
     return () => {
+      window.clearTimeout(initialUpdate);
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      window.removeEventListener("hashchange", update);
       cancelAnimationFrame(frame);
     };
   }, []);
@@ -75,7 +80,6 @@ export function TimelineScene() {
               <h3>{location.name}</h3>
               <StoryImage src={location.image} alt={`${location.name} relationship memory`} label={location.imageLabel} className={`journey-photo ratio-${location.ratio.replace(":", "-")}`} />
               <p className="journey-caption">{location.caption}</p>
-              <p className="coordinate-note">{location.coordinateLabel}</p>
             </article>
           ))}
         </div>

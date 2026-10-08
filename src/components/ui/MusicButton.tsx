@@ -5,7 +5,25 @@ import Image from "next/image";
 import { connectAudio, setAudioGain } from "@/lib/audio";
 
 const chapterVolume = [0.38, 0.45, 0.38, 0.43, 0.44, 0.42, 0.2, 0.24, 0.46];
-const lyricLineCount = 34;
+// Cue points follow the 2:58 recording's sections; playback time remains the source of truth.
+const lyricCueTimes = [0, 2.1, 4.5, 7, 9.8, 12.8, 16, 20.5, 23.5, 26.5, 29.5, 32.5, 35.5, 38.5, 41.5, 44.5, 47.5, 53, 56, 59, 62, 67, 71.5, 76, 80.5, 85, 89.5, 94, 98.5, 104, 108, 112, 116, 120, 124];
+
+const lyricLines = [
+  "தீம்", "தனனா தீம்", "ததீம் தனனா தீம்", "தீம், தனனா தீம், தனனா-நனா தீம்", "ததீம் தனனா தீம், தான நானா தீம்", "தீம், தனனா தீம், தனனா-நனா தீம்", "ததீம் தனனா தீம்",
+  "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ காற்றில்?", "பேசாமலே காதல் வாராதோ?", "நீங்காமலே தூரம் போகாதோ?", "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதலே கண்ணீருமாய் கரைந்தாய்", "காதலே கண்ணீருமாய் கரைந்தாய்",
+  "संत बताशी जोड़, तेरे हरि", "साधु बताशी जोड़", "संत बताशी जोड़, तेरे हरि", "साधु बताशी जोड़",
+  "மனமொழியில் பேசும் மதி இரவை காண", "விழிமொழியில் பேச ஏங்காதோ?", "பகலிரவை காண, பனிமலரை தேட", "பிழை புரியும் நேரம் வாராதோ?", "உன் பார்வை பார்த்திருந்தேன், காலம் காத்திருந்தேன்", "நெஞ்சம் பொய் சொன்னதே, காதல் என்றுரைத்தேன்", "உன் பார்வை பார்த்திருந்தேன், காலம் காத்திருந்தேன்", "நெஞ்சம் பொய் சொன்னதே, காதல் என்றுரைத்தேன்",
+  "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதலே கண்ணீருமாய் கரைந்தாய்", "காதலே கண்ணீருமாய் கரைந்தாய்",
+];
+
+function lyricIndexAt(time: number) {
+  let index = 0;
+  for (let cue = 1; cue < lyricCueTimes.length; cue++) {
+    if (time < lyricCueTimes[cue]) break;
+    index = cue;
+  }
+  return Math.min(index, lyricLines.length - 1);
+}
 
 export function MusicButton() {
   const controlRef = useRef<HTMLDivElement>(null);
@@ -17,14 +35,6 @@ export function MusicButton() {
   const [expanded, setExpanded] = useState(false);
   const [currentLine, setCurrentLine] = useState(0);
   const [error, setError] = useState(false);
-
-  const lyricLines = [
-    "தீம்", "தனனா தீம்", "ததீம் தனனா தீம்", "தீம், தனனா தீம், தனனா-நனா தீம்", "ததீம் தனனா தீம், தான நானா தீம்", "தீம், தனனா தீம், தனனா-நனா தீம்", "ததீம் தனனா தீம்",
-    "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ காற்றில்?", "பேசாமலே காதல் வாராதோ?", "நீங்காமலே தூரம் போகாதோ?", "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதலே கண்ணீருமாய் கரைந்தாய்", "காதலே கண்ணீருமாய் கரைந்தாய்",
-    "संत बताशी जोड़, तेरे हरि", "साधु बताशी जोड़", "संत बताशी जोड़, तेरे हरि", "साधु बताशी जोड़",
-    "மனமொழியில் பேசும் மதி இரவை காண", "விழிமொழியில் பேச ஏங்காதோ?", "பகலிரவை காண, பனிமலரை தேட", "பிழை புரியும் நேரம் வாராதோ?", "உன் பார்வை பார்த்திருந்தேன், காலம் காத்திருந்தேன்", "நெஞ்சம் பொய் சொன்னதே, காதல் என்றுரைத்தேன்", "உன் பார்வை பார்த்திருந்தேன், காலம் காத்திருந்தேன்", "நெஞ்சம் பொய் சொன்னதே, காதல் என்றுரைத்தேன்",
-    "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதல் வாராதோ, தூரம் போகாதோ?", "கண்கள் ஏங்காதோ, காற்றில் கரையாதோ?", "காதலே கண்ணீருமாய் கரைந்தாய்", "காதலே கண்ணீருமாய் கரைந்தாய்",
-  ];
 
   const startMusic = useCallback(async () => {
     const audio = audioRef.current;
@@ -42,7 +52,7 @@ export function MusicButton() {
   const stopMusic = useCallback(() => audioRef.current?.pause(), []);
 
   useEffect(() => {
-    const onGesture = () => { setExpanded(true); void startMusic(); };
+    const onGesture = () => { setExpanded(true); if (audioRef.current?.paused) void startMusic(); };
     const onScene = (event: Event) => {
       const next = (event as CustomEvent<number>).detail;
       if (!Number.isInteger(next)) return;
@@ -71,13 +81,11 @@ export function MusicButton() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    const syncTime = () => {
-      const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 180;
-      setCurrentLine(Math.min(lyricLineCount - 1, Math.floor((audio.currentTime / duration) * lyricLineCount)));
-    };
+    const syncTime = () => setCurrentLine(lyricIndexAt(audio.currentTime));
     audio.addEventListener("timeupdate", syncTime);
     audio.addEventListener("seeked", syncTime);
-    return () => { audio.removeEventListener("timeupdate", syncTime); audio.removeEventListener("seeked", syncTime); };
+    audio.addEventListener("loadedmetadata", syncTime);
+    return () => { audio.removeEventListener("timeupdate", syncTime); audio.removeEventListener("seeked", syncTime); audio.removeEventListener("loadedmetadata", syncTime); };
   }, []);
 
   useEffect(() => {
@@ -126,7 +134,7 @@ export function MusicButton() {
   }
 
   return <div ref={controlRef} className={`music-control ${expanded ? "is-expanded" : ""} ${playing ? "is-playing" : ""}`}>
-    <audio ref={audioRef} loop preload="none" src="/audio/background-music.mp3" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => { setPlaying(false); setError(true); }} />
+    <audio ref={audioRef} loop preload="auto" src="/audio/background-music.mp3" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => { setPlaying(false); setError(true); }} />
     <button type="button" className={`music-float ${playing ? "is-playing" : ""}`} onClick={tapFloatingButton} aria-label={expanded ? "Collapse music player" : playing ? "Expand music player" : "Play Pesamale"} aria-expanded={expanded}>
       <span className="music-pulse" aria-hidden="true" />
       <span className="music-note" aria-hidden="true">{playing ? <span className="music-wave"><i /><i /><i /><i /><i /></span> : "♪"}</span>

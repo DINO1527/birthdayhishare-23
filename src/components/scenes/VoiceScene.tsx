@@ -6,6 +6,7 @@ import { StoryImage } from "@/components/ui/StoryImage";
 import { announceVoice, connectAudio, setAudioGain } from "@/lib/audio";
 
 const formatTime = (time: number) => `${Math.floor(time / 60).toString().padStart(2, "0")}:${Math.floor(time % 60).toString().padStart(2, "0")}`;
+const waveformHeights = Array.from({ length: 48 }, (_, index) => `${(12 + Math.sin(index * 1.7) ** 2 * Math.sin(index / 47 * Math.PI) * 80).toFixed(2)}%`);
 
 export function VoiceScene({ source = "/audio/voice-preview.wav", sample = true }: { source?: string; sample?: boolean }) {
   const root = useRef<HTMLElement>(null);
@@ -84,7 +85,7 @@ export function VoiceScene({ source = "/audio/voice-preview.wav", sample = true 
           <svg viewBox="0 0 40 40" aria-hidden="true">{playing ? <path d="M11 8h6v24h-6zm12 0h6v24h-6z" /> : <path d="M12 6l23 14-23 14z" />}</svg>
         </button>
         <div ref={waveformRef} className="waveform waveform-scrubber" role="slider" aria-label="Seek through voice message on the waveform" aria-valuemin={0} aria-valuemax={Math.round(duration)} aria-valuenow={Math.round(time)} aria-valuetext={`${formatTime(time)} of ${formatTime(duration)}`} tabIndex={duration ? 0 : -1} onPointerDown={(event) => { if (!duration) return; event.currentTarget.setPointerCapture(event.pointerId); seek(event); }} onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) seek(event); }} onKeyDown={seekByKeyboard}>
-          {Array.from({ length: 48 }, (_, index) => <i key={index} className={index / 48 <= progress ? "is-played" : ""} style={{ height: `${12 + Math.sin(index * 1.7) ** 2 * Math.sin(index / 47 * Math.PI) * 80}%`, animationDelay: `${index * -0.11}s` }} />)}
+          {waveformHeights.map((height, index) => <i key={index} className={index / 48 <= progress ? "is-played" : ""} style={{ height, animationDelay: `${index * -0.11}s` }} />)}
         </div>
         <p className="voice-caption">{sample ? "A LITTLE SAMPLE · TAP THE WAVE TO REPLAY" : "JUST MY VOICE. JUST FOR YOU."}</p>
         {status && <p className="asset-note" role="status">{status}</p>}
