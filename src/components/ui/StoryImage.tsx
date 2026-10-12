@@ -10,9 +10,10 @@ type StoryImageProps = {
   className?: string;
   sizes?: string;
   eager?: boolean;
+  onSettled?: () => void;
 };
 
-export function StoryImage({ src, alt, label, className = "", sizes = "(max-width: 900px) 92vw, 44vw", eager = false }: StoryImageProps) {
+export function StoryImage({ src, alt, label, className = "", sizes = "(max-width: 900px) 92vw, 44vw", eager = false, onSettled }: StoryImageProps) {
   const [missing, setMissing] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -33,7 +34,8 @@ export function StoryImage({ src, alt, label, className = "", sizes = "(max-widt
           unoptimized
           sizes={sizes}
           loading={eager ? "eager" : "lazy"}
-          onError={() => setMissing(true)}
+          onLoad={onSettled}
+          onError={() => { setMissing(true); onSettled?.(); }}
         />
       )}
       {missing && (

@@ -10,8 +10,10 @@ import { BotanicalBackdrop } from "@/components/ui/BotanicalBackdrop";
 
 export function MemoriesScene() {
   const root = useRef<HTMLElement>(null);
+  const progressIndicator = useRef<HTMLDivElement>(null);
+  const progressFill = useRef<HTMLElement>(null);
+  const progressCount = useRef<HTMLSpanElement>(null);
   const [selected, setSelected] = useState<(typeof memories)[number] | null>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const reduced = useReducedMotion();
   useOverlayLock(Boolean(selected));
@@ -25,7 +27,13 @@ export function MemoriesScene() {
       frame = requestAnimationFrame(() => {
         const bounds = section.getBoundingClientRect();
         const scrollableDistance = Math.max(1, bounds.height - window.innerHeight);
-        setScrollProgress(Math.min(1, Math.max(0, -bounds.top / scrollableDistance)));
+        const progress = Math.min(1, Math.max(0, -bounds.top / scrollableDistance));
+        const currentMemory = Math.min(memories.length, Math.floor(progress * memories.length) + 1);
+        progressFill.current?.style.setProperty("transform", `scaleY(${progress})`);
+        progressIndicator.current?.setAttribute("aria-valuenow", String(Math.round(progress * 100)));
+        if (progressCount.current) {
+          progressCount.current.textContent = `${String(currentMemory).padStart(2, "0")} / ${String(memories.length).padStart(2, "0")}`;
+        }
       });
     };
     const observer = new IntersectionObserver(([entry]) => setShowProgress(entry.isIntersecting), { threshold: 0 });
@@ -43,12 +51,23 @@ export function MemoriesScene() {
 
   useGSAP(() => {
     if (reduced) return;
-    gsap.from(".memory-card", { opacity: 0, y: 70, z: -90, scale: 0.9, rotateX: 10, rotateY: (index) => index % 2 === 0 ? -7 : 7, transformPerspective: 1100, duration: 1, stagger: 0.12, ease: "power3.out", scrollTrigger: { trigger: root.current, start: "top 84%" } });
-    gsap.to(".memory-card:nth-child(odd)", { yPercent: -11, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: true } });
-    gsap.to(".memory-card:nth-child(even)", { yPercent: 7, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: true } });
-    gsap.to(".memories-scene .opening-florals", { yPercent: -18, z: 105, rotateX: 5, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: 0.8 } });
-    gsap.to(".memories-scene .opening-atmosphere", { yPercent: 13, z: -80, scale: 1.08, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: 0.8 } });
-    gsap.to(".memories-scene .garden-shadow", { yPercent: 22, scale: 1.12, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: 1 } });
+    gsap.utils.toArray<HTMLElement>(".memory-card").forEach((card, index) => {
+      gsap.from(card, {
+        opacity: 0,
+        y: 32,
+        z: -24,
+        scale: 0.97,
+        rotateX: 3,
+        rotateY: index % 2 === 0 ? -2 : 2,
+        transformPerspective: 1100,
+        duration: 0.72,
+        ease: "power2.out",
+        scrollTrigger: { trigger: card, start: "top 88%", once: true },
+      });
+    });
+    gsap.to(".memories-scene .opening-florals", { yPercent: -12, z: 45, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: 0.8 } });
+    gsap.to(".memories-scene .opening-atmosphere", { yPercent: 8, scale: 1.04, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: 0.8 } });
+    gsap.to(".memories-scene .garden-shadow", { yPercent: 12, scale: 1.06, ease: "none", scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: 1 } });
   }, { scope: root, dependencies: [reduced] });
 
   useEffect(() => {
@@ -66,10 +85,10 @@ export function MemoriesScene() {
         <h2>A Few Beautiful<br />Moments</h2>
         <p>Snapshots from a journey I&apos;m grateful for.</p>
       </div>
-      {showProgress && <div className="memory-progress" role="progressbar" aria-label="Photo archive scroll progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(scrollProgress * 100)}>
+      {showProgress && <div className="memory-progress" ref={progressIndicator} role="progressbar" aria-label="Photo archive scroll progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0}>
         <span className="memory-progress-label">PHOTO<br />ARCHIVE</span>
-        <span className="memory-progress-track"><i style={{ transform: `scaleY(${scrollProgress})` }} /></span>
-        <span className="memory-progress-count">{String(Math.min(memories.length, Math.floor(scrollProgress * memories.length) + 1)).padStart(2, "0")} / {String(memories.length).padStart(2, "0")}</span>
+        <span className="memory-progress-track"><i ref={progressFill} /></span>
+        <span className="memory-progress-count" ref={progressCount}>{String(1).padStart(2, "0")} / {String(memories.length).padStart(2, "0")}</span>
       </div>}
       <div className="memory-cloud">
         {memories.map((memory) => (

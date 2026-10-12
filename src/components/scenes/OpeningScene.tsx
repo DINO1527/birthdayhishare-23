@@ -142,7 +142,8 @@ export function OpeningScene() {
     event.preventDefault();
     let result: { stage?: number; correct?: boolean; error?: string } = {};
     try {
-      const response = await fetch("/api/story-session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answer }), cache: "no-store" });
+      const normalizedAnswer = answer.normalize("NFKC").trim().toLocaleLowerCase().replace(/\s+/g, " ");
+      const response = await fetch("/api/story-session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answer: normalizedAnswer }), cache: "no-store" });
       result = await response.json();
     } catch { setFeedback("Connection lost. Please try again."); return; }
     if (!result.correct) {
@@ -197,7 +198,11 @@ export function OpeningScene() {
                 <input ref={inputRef} id="private-answer" name="private-answer" value={answer} onChange={(event) => { setAnswer(event.target.value); setFeedback(""); }} autoComplete="off" spellCheck={false} aria-describedby="answer-feedback" />
                 <button type="submit" aria-label="Submit answer">{success ? "✓" : "→"}</button>
               </div>
-              <p id="answer-feedback" className="answer-feedback" aria-live="polite">{feedback || "This is just between us."}</p>
+              <p id="answer-feedback" className={`answer-feedback ${success ? "is-celebrating" : ""}`} aria-live="polite">
+                {success && <span className="success-sparkle" aria-hidden="true">✦</span>}
+                {feedback || "This is just between us."}
+                {success && <span className="success-sparkle" aria-hidden="true">✦</span>}
+              </p>
             </form>
         </div>
       )}
