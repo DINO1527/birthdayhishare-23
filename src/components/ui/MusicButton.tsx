@@ -31,6 +31,8 @@ export function MusicButton() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const activeChapter = useRef(1);
   const voicePlaying = useRef(false);
+  const surpriseVideoPlaying = useRef(false);
+  const currentMusicGain = () => surpriseVideoPlaying.current ? 0 : voicePlaying.current ? 0.18 : 1;
   const [playing, setPlaying] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [currentLine, setCurrentLine] = useState(0);
@@ -44,7 +46,7 @@ export function MusicButton() {
       const playback = audio.play();
       const [graph] = await Promise.all([connectAudio(audio), playback]);
       analyserRef.current = graph.analyser;
-      setAudioGain(audio, chapterVolume[activeChapter.current - 1] * (voicePlaying.current ? 0.18 : 1), 1.1);
+      setAudioGain(audio, chapterVolume[activeChapter.current - 1] * currentMusicGain(), 1.1);
       setError(false);
     } catch { setError(true); }
   }, []);
@@ -58,22 +60,29 @@ export function MusicButton() {
       if (!Number.isInteger(next)) return;
       activeChapter.current = Math.max(1, Math.min(chapterVolume.length, next));
       const audio = audioRef.current;
-      if (audio && !audio.paused) setAudioGain(audio, chapterVolume[activeChapter.current - 1] * (voicePlaying.current ? 0.18 : 1), 0.8);
+      if (audio && !audio.paused) setAudioGain(audio, chapterVolume[activeChapter.current - 1] * currentMusicGain(), 0.8);
     };
     const onVoice = (event: Event) => {
       voicePlaying.current = (event as CustomEvent<boolean>).detail;
       const audio = audioRef.current;
-      if (audio && !audio.paused) setAudioGain(audio, chapterVolume[activeChapter.current - 1] * (voicePlaying.current ? 0.18 : 1), 0.7);
+      if (audio && !audio.paused) setAudioGain(audio, chapterVolume[activeChapter.current - 1] * currentMusicGain(), 0.7);
+    };
+    const onSurpriseVideo = (event: Event) => {
+      surpriseVideoPlaying.current = (event as CustomEvent<boolean>).detail;
+      const audio = audioRef.current;
+      if (audio && !audio.paused) setAudioGain(audio, chapterVolume[activeChapter.current - 1] * currentMusicGain(), 0.35);
     };
     const onVisibility = () => { if (document.hidden) stopMusic(); };
     window.addEventListener("birthday-story-music-start", onGesture);
     window.addEventListener("birthday-scene-change", onScene);
     window.addEventListener("birthday-voice-playing", onVoice);
+    window.addEventListener("birthday-surprise-video-playing", onSurpriseVideo);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       window.removeEventListener("birthday-story-music-start", onGesture);
       window.removeEventListener("birthday-scene-change", onScene);
       window.removeEventListener("birthday-voice-playing", onVoice);
+      window.removeEventListener("birthday-surprise-video-playing", onSurpriseVideo);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [startMusic, stopMusic]);

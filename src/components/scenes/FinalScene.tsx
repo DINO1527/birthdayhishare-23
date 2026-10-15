@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/animation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { StoryImage } from "@/components/ui/StoryImage";
@@ -8,12 +9,17 @@ import { useOverlayLock } from "@/hooks/useOverlayLock";
 
 export function FinalScene() {
   const root = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [revealed, setRevealed] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
   const [photoReady, setPhotoReady] = useState(false);
   const reduced = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   useOverlayLock(revealed);
+
+  useEffect(() => setPortalReady(true), []);
 
   useEffect(() => {
     if (!revealed) return;
@@ -22,6 +28,27 @@ export function FinalScene() {
     const close = (event: KeyboardEvent) => { if (event.key === "Escape") setRevealed(false); };
     window.addEventListener("keydown", close);
     return () => { window.removeEventListener("keydown", close); trigger?.focus(); };
+  }, [revealed]);
+
+  useEffect(() => {
+    if (!revealed) return;
+    void videoRef.current?.play().catch(() => setVideoPlaying(false));
+  }, [revealed]);
+
+  const toggleVideoPlayback = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      try { await video.play(); } catch { setVideoPlaying(false); }
+    } else video.pause();
+  };
+
+  useEffect(() => {
+    if (!revealed) return;
+    return () => {
+      videoRef.current?.pause();
+      window.dispatchEvent(new CustomEvent("birthday-surprise-video-playing", { detail: false }));
+    };
   }, [revealed]);
 
   useGSAP(
@@ -68,13 +95,46 @@ export function FinalScene() {
         <span className="final-bottom-mark final-reveal" aria-hidden="true">D &amp; H <i>✦</i> ALWAYS</span>
       </div>
 
-      {revealed && (
-        <div className="final-modal" role="dialog" aria-modal="true" aria-label="Final birthday surprise">
-          <button type="button" ref={closeRef} className="modal-close" onClick={() => setRevealed(false)} aria-label="Close">×</button>
-          <p className="eyebrow">ONE LAST WISH</p>
-          <h3>For every tomorrow.</h3>
-          <p>May this year be gentle with your heart and brave with your dreams. Whatever comes, I hope we keep finding joy in the little things—and keep finding our way to each other.</p>
-        </div>
+      {portalReady && createPortal(
+        <div className={`final-surprise-overlay ${revealed ? "is-revealed" : ""}`} aria-hidden={!revealed} inert={!revealed}>
+          <div className="surprise-flurries" aria-hidden="true">
+            <i>✿</i><i>❄</i><i>✧</i><i>❀</i><i>❄</i><i>✿</i>
+            <i>❄</i><i>✧</i><i>❀</i><i>❄</i><i>✿</i><i>❄</i>
+          </div>
+          <div className="final-modal final-video-modal" role="dialog" aria-modal="true" aria-label="Final birthday surprise" aria-hidden={!revealed}>
+            <button type="button" ref={closeRef} className="modal-close" onClick={() => setRevealed(false)} aria-label="Close surprise">×</button>
+            <p className="eyebrow">ONE LAST WISH</p>
+            <h3>For every tomorrow.</h3>
+            <div className="surprise-player">
+              <video
+                ref={videoRef}
+                className="final-surprise-video"
+                src="/videos/suprise_vedio.mp4"
+                autoPlay={revealed}
+                playsInline
+                preload="auto"
+                controlsList="nodownload nofullscreen noplaybackrate"
+                disablePictureInPicture
+                aria-label="Birthday surprise video"
+                onClick={() => void toggleVideoPlayback()}
+                onPlay={() => { setVideoPlaying(true); window.dispatchEvent(new CustomEvent("birthday-surprise-video-playing", { detail: true })); }}
+                onPause={() => { setVideoPlaying(false); window.dispatchEvent(new CustomEvent("birthday-surprise-video-playing", { detail: false })); }}
+                onEnded={() => {
+                  setVideoPlaying(false);
+                  setRevealed(false);
+                  window.dispatchEvent(new CustomEvent("birthday-surprise-video-playing", { detail: false }));
+                }}
+              />
+              <div className="surprise-controls" aria-label="Video controls">
+                <button type="button" className="surprise-play" onClick={() => void toggleVideoPlayback()} aria-label={videoPlaying ? "Pause video" : "Play video"}>
+                  {videoPlaying ? "Ⅱ" : "▶"}
+                </button>
+                <span className="surprise-play-label">{videoPlaying ? "Enjoy your surprise" : "Play your surprise"}</span>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body,
       )}
     </section>
   );
