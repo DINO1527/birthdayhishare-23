@@ -41,8 +41,49 @@ export function OpeningScene() {
   const loadingProgress = loaded / photos.length;
 
   useEffect(() => {
-    if (phase === "loading") gameDialogRef.current?.focus({ preventScroll: true });
+    if (phase === "loading" || phase === "unlocking") gameDialogRef.current?.focus({ preventScroll: true });
   }, [phase, loadingGameStep]);
+
+  // Safari's visual viewport changes as its bars collapse and when the keyboard
+  // opens. Keep the locked entrance and its dialogs inside the visible area.
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    const syncViewport = () => {
+      document.documentElement.style.setProperty(
+        "--story-viewport-height",
+        `${Math.round(viewport?.height ?? window.innerHeight)}px`,
+      );
+    };
+    syncViewport();
+    viewport?.addEventListener("resize", syncViewport);
+    window.addEventListener("resize", syncViewport);
+    return () => {
+      viewport?.removeEventListener("resize", syncViewport);
+      window.removeEventListener("resize", syncViewport);
+      document.documentElement.style.removeProperty("--story-viewport-height");
+    };
+  }, []);
+
+  // Safari can interpret a fast downward swipe at scrollTop 0 as pull-to-refresh.
+  // Suppress only that edge gesture; ordinary page and dialog scrolling remain native.
+  useEffect(() => {
+    let startY = 0;
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) startY = event.touches[0].clientY;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1 || window.scrollY > 0 || event.touches[0].clientY <= startY) return;
+      const target = event.target;
+      if (target instanceof Element && target.closest("input, textarea, [contenteditable='true']")) return;
+      event.preventDefault();
+    };
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => {
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchmove", onTouchMove);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,11 +170,12 @@ export function OpeningScene() {
     return () => window.clearTimeout(timer);
   }, [phase]);
 
+  // Don't autofocus on touch devices: iOS opens the keyboard without an explicit
+  // tap and shrinks the visible viewport underneath the opening/game experience.
   useEffect(() => {
-    if (phase === "question") window.setTimeout(() => {
-      window.scrollTo(0, 0);
-      inputRef.current?.focus({ preventScroll: true });
-    }, 500);
+    if (phase !== "question" || window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
+    const timer = window.setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 500);
+    return () => window.clearTimeout(timer);
   }, [phase, questionIndex]);
 
   function beginEntrance() {
@@ -212,7 +254,7 @@ export function OpeningScene() {
         </div>
       )}
       {phase === "unlocking" && <p className="opening-status" role="status">Our story is opening…</p>}
-      {phase === "loading" && (
+      {(phase === "loading" || phase === "unlocking") && (
         <>
           <div className="story-loading">
             <p className="eyebrow">OUR STORY IS UNFOLDING</p>

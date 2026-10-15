@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/animation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -12,14 +12,16 @@ export function FinalScene() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [revealed, setRevealed] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
+  const portalReady = useSyncExternalStore(
+    () => () => {},
+    () => typeof document !== "undefined",
+    () => false,
+  );
   const [photoReady, setPhotoReady] = useState(false);
   const reduced = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   useOverlayLock(revealed);
-
-  useEffect(() => setPortalReady(true), []);
 
   useEffect(() => {
     if (!revealed) return;
@@ -45,8 +47,9 @@ export function FinalScene() {
 
   useEffect(() => {
     if (!revealed) return;
+    const video = videoRef.current;
     return () => {
-      videoRef.current?.pause();
+      video?.pause();
       window.dispatchEvent(new CustomEvent("birthday-surprise-video-playing", { detail: false }));
     };
   }, [revealed]);

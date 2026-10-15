@@ -4,9 +4,12 @@ import { useEffect } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 const reveals = [
-  "#hero .hero-copy", "#journey .journey-heading",
+  // These sections do not own a GSAP entrance timeline. Keep the reveal
+  // targets distinct from the hero, letter, and finale animations to avoid
+  // competing transforms when a scene enters the viewport.
+  "#story-map .map-story-intro", "#journey .journey-heading",
   "#journey .journey-map-frame", "#memories .section-heading", "#reasons .section-heading",
-  "#voice .voice-content", "#letter .letter-paper", "#finale .final-content",
+  "#voice .voice-content",
 ];
 
 export function SceneLandingTransitions() {
@@ -20,9 +23,9 @@ export function SceneLandingTransitions() {
         if (!entry.isIntersecting) continue;
         observer.unobserve(entry.target);
         animations.push(entry.target.animate([
-          { opacity: 0.45, transform: "translate3d(0, 26px, 0) rotateX(2deg)", filter: "blur(3px)" },
-          { opacity: 1, transform: "translate3d(0, 0, 0) rotateX(0deg)", filter: "blur(0)" },
-        ], { duration: 780, easing: "cubic-bezier(.18,.7,.2,1)" }));
+          { opacity: 0.35, transform: "translate3d(0, 20px, 0)" },
+          { opacity: 1, transform: "translate3d(0, 0, 0)" },
+        ], { duration: 680, easing: "cubic-bezier(.2,.7,.25,1)" }));
       }
     }, { rootMargin: "0px 0px -12% 0px", threshold: 0.01 });
     for (const selector of reveals) {
