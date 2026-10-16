@@ -49,7 +49,7 @@ export function LetterScene() {
         <div className="letter-pin letter-pin-bottom" aria-hidden="true"><i /><i /><i /><i /><i /><b /><span /></div>
         <p className="eyebrow">08 / A BIRTHDAY LETTER</p>
         <div className="letter-heading"><span className="letter-stamp" aria-hidden="true">♡</span><h2>For You</h2></div>
-        <div className="letter-copy" role="region" tabIndex={0} aria-label="Scrollable birthday letter">
+        <div className="letter-copy" role="region" tabIndex={0} aria-label="Birthday letter">
           <p className="letter-paragraph"><strong>Happy Birthday, my love.</strong> Happy Birthday, My Precious Pattu Ma! 🎂💖✨</p>
           <p className="letter-paragraph">You are the absolute gem of my life and the love of my whole world! 💎 You know how people say the sunrise is beautiful? It really is, because my girl came into my life like a bright new day. 🌅</p>
           <p className="letter-paragraph">En irundhu pona vaazhkaiyil oli eathi vacha en kuthu vilakku... ena maayam senju ena thookuna di! ✨</p>

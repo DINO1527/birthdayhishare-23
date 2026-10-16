@@ -34,15 +34,5 @@ export function SceneProgress() {
     };
   }, []);
 
-  return (
-    <aside className="scene-progress" aria-label="Story progress">
-      <div className="scene-count">
-        {String(current).padStart(2, "0")} <span>/ {String(sceneLabels.length).padStart(2, "0")}</span>
-      </div>
-      <div className="scene-progress-track">
-        <span style={{ width: `${(current / sceneLabels.length) * 100}%` }} />
-      </div>
-      <div className="scene-label">{sceneLabels[current - 1]}</div>
-    </aside>
-  );
+  return null;
 }

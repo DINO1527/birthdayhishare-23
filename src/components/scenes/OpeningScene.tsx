@@ -79,7 +79,7 @@ export function OpeningScene() {
     const onTouchMove = (event: TouchEvent) => {
       if (event.touches.length !== 1 || window.scrollY > 0 || event.touches[0].clientY <= startY) return;
       const target = event.target;
-      if (target instanceof Element && target.closest("input, textarea, [contenteditable='true']")) return;
+      if (target instanceof Element && target.closest("input, textarea, [contenteditable='true'], .entrance-question-backdrop, .loading-game-backdrop")) return;
       event.preventDefault();
     };
     document.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -151,7 +151,7 @@ export function OpeningScene() {
 
     if (location.hash) history.replaceState(null, "", `${location.pathname}${location.search}`);
     window.scrollTo(0, 0);
-    const stop = (event: Event) => { if (!(event.target instanceof Element && event.target.closest("input, .question-card, .music-card"))) event.preventDefault(); };
+    const stop = (event: Event) => { if (!(event.target instanceof Element && event.target.closest("input, .entrance-question-backdrop, .question-card, .loading-game-backdrop, .music-card"))) event.preventDefault(); };
     const stopKey = (event: KeyboardEvent) => { if (blockedKeys.has(event.key) && !(event.target instanceof Element && event.target.closest("input, button"))) event.preventDefault(); };
     const keepAtTop = () => window.scrollTo(0, 0);
     window.addEventListener("wheel", stop, { passive: false });
@@ -242,7 +242,8 @@ export function OpeningScene() {
       {phase === "sealed" && <button type="button" className="primary-pill entrance-open" onClick={beginEntrance}>Open <span aria-hidden="true">→</span></button>}
       {phase === "checking" && <p className="entrance-checking" role="status">Preparing your story…</p>}
       {phase === "question" && (
-        <div className={`question-card ${success ? "is-success" : ""}`}>
+        <div className="entrance-question-backdrop">
+          <div className={`question-card ${success ? "is-success" : ""}`}>
             <form key={`${question.id}-${shake}`} onSubmit={submitAnswer} className={feedback && !success ? "is-wrong" : ""}>
               <p className="eyebrow">PRIVATE QUESTION {String(questionIndex + 1).padStart(2, "0")} / {String(entranceQuestions.length).padStart(2, "0")}</p>
               <label htmlFor="private-answer">{question.question}</label>
@@ -256,6 +257,7 @@ export function OpeningScene() {
                 {success && <span className="success-sparkle" aria-hidden="true">✦</span>}
               </p>
             </form>
+          </div>
         </div>
       )}
       {phase === "unlocking" && <p className="opening-status" role="status">Our story is opening…</p>}

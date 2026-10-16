@@ -25,7 +25,6 @@ body {
 html.story-locked, body.story-locked, body.story-booting {
   overflow: hidden !important;
   overscroll-behavior: none;
-  touch-action: none;
 }
 html.story-modal-open, body.story-modal-open { overflow: hidden !important; overscroll-behavior: none; }
 button, input, textarea { font: inherit; }
@@ -1059,4 +1058,74 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .memories-scene .opening-atmosphere span { filter:blur(42px); opacity:.4; }
 .memories-scene .opening-floral { filter:blur(var(--blur)) drop-shadow(0 8px 10px rgba(71,54,45,.12)); }
 .memories-scene .memory-card .story-image { box-shadow:0 14px 32px #342b2020; }
+
+/* Keep the entry questions and game on their own visible screen. The visual
+   viewport variables shrink this screen to the space above the iOS keyboard. */
+.entrance-question-backdrop,
+.loading-game-backdrop {
+  position: fixed;
+  z-index: 100;
+  top: var(--story-viewport-top, 0px);
+  right: 0;
+  left: 0;
+  height: var(--story-viewport-height, 100dvh);
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  backdrop-filter: none;
+  display: grid;
+  place-items: center;
+  padding: max(.75rem, env(safe-area-inset-top)) 1rem max(.75rem, env(safe-area-inset-bottom));
+  background: radial-gradient(ellipse at 50% 32%, #fffaf2 0, #e9e4da 68%, #d6d0c6 100%);
+  animation: game-backdrop-in .35s ease both;
+}
+.entrance-question-backdrop { z-index: 90; }
+.entrance-question-backdrop .question-card {
+  position: relative;
+  inset: auto;
+  top: auto;
+  left: auto;
+  width: min(560px, 100%);
+  min-height: 0;
+  max-height: calc(var(--story-viewport-height, 100dvh) - 1.5rem);
+  margin: auto;
+  padding: clamp(1rem, 5vw, 2.5rem);
+  translate: 0 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  transform: none;
+  touch-action: pan-y;
+}
+.loading-game-backdrop { z-index: 100; }
+.loading-game-backdrop .loading-love-game {
+  max-height: calc(var(--story-viewport-height, 100dvh) - 1.5rem);
+}
+@media (max-height: 520px) {
+  .entrance-question-backdrop .question-card label { margin-bottom: 1rem; font-size: clamp(1.4rem, 6vh, 2rem); }
+}
+
+/* The letter grows with its complete text so the next scene always follows it. */
+.letter-scene {
+  height: auto;
+  min-height: 100svh;
+  overflow: visible;
+  align-content: center;
+}
+.letter-paper {
+  height: auto;
+  min-height: min(82svh, 790px);
+  overflow: visible;
+}
+.letter-copy {
+  flex: initial;
+  min-height: 0;
+  overflow: visible;
+  overscroll-behavior: auto;
+  -webkit-overflow-scrolling: auto;
+}
+@media (max-width: 560px) {
+  .letter-paper { height: auto; min-height: calc(100svh - 6.2rem); }
+}
 .memories-scene .memory-card:focus-visible { outline:2px solid #765657; outline-offset:6px; }
