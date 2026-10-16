@@ -16,7 +16,7 @@ export const entranceQuestions: EntranceQuestion[] = [
   {
     id: "first-love-language",
     question: "What is our first version of saying “love you”?",
-    hint: "Not quite… think about us.",
+    hint: "Not quite… spacing doesn’t matter.",
     successMessage: "You remembered.",
   },
   {

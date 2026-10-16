@@ -175,14 +175,6 @@ export function OpeningScene() {
     return () => window.clearTimeout(timer);
   }, [phase]);
 
-  // Don't autofocus on touch devices: iOS opens the keyboard without an explicit
-  // tap and shrinks the visible viewport underneath the opening/game experience.
-  useEffect(() => {
-    if (phase !== "question" || window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
-    const timer = window.setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 500);
-    return () => window.clearTimeout(timer);
-  }, [phase, questionIndex]);
-
   function beginEntrance() {
     if (phase === "sealed") {
       window.dispatchEvent(new Event("birthday-story-music-start"));

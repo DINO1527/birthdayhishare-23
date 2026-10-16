@@ -18,8 +18,12 @@ export function normalizeAnswer(value: string) {
 export function answerMatches(stage: number, answer: string) {
   const expected = answers[stage];
   if (!expected || answer.length > 120) return false;
-  const received = createHmac("sha256", secret()).update(normalizeAnswer(answer)).digest();
-  const known = createHmac("sha256", secret()).update(normalizeAnswer(expected)).digest();
+  const normalize = (value: string) => {
+    const normalized = normalizeAnswer(value);
+    return stage === 0 ? normalized.replace(/\s/g, "") : normalized;
+  };
+  const received = createHmac("sha256", secret()).update(normalize(answer)).digest();
+  const known = createHmac("sha256", secret()).update(normalize(expected)).digest();
   return timingSafeEqual(received, known);
 }
 
