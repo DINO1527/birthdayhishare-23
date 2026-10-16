@@ -13,7 +13,7 @@ export function StoryMapScene() {
         <StoryOriginsMap />
         <div className="map-story-intro">
           <p className="eyebrow">03 / WHERE IT STARTED</p>
-          <h2>Where Our<br />Story Started</h2>
+          <h2><span className="scene-title-line">Where Our</span><span className="scene-title-line">Story Started</span></h2>
           <p>One world. One island. One city. Two lives.</p>
         </div>
         <div className="map-zoom-copy" aria-hidden="true">

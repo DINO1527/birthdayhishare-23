@@ -79,6 +79,7 @@ button { color: inherit; }
 
 h1, h2, h3, p { margin-top: 0; }
 h1, h2, h3 { font-family: var(--serif); font-weight: 500; }
+.scene-title-line { display: block; }
 h2 {
   margin-bottom: 1rem;
   font-size: clamp(3.4rem, 9vw, 8.6rem);
@@ -932,7 +933,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .memories-scene .opening-floral:nth-child(3) { right:5%; top:40%; }
 .memories-scene .opening-floral:nth-child(4) { right:12%; top:72%; }
 .memories-scene .memory-cloud { position:relative; z-index:2; }
-.memory-card { will-change:transform; transition:box-shadow .55s ease,filter .55s ease; }
+.memory-card { transition:box-shadow .3s ease,filter .3s ease; }
 .memory-card:hover { z-index:3; filter:saturate(1.04); box-shadow:0 38px 90px #211b1533; }
 .memory-card .story-image { transition:border-radius .7s ease; }
 .memories-scene .garden-shadow { opacity:.09; }
@@ -1005,6 +1006,22 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .garden-shadow,.voice-portrait,.final-atmosphere i { animation:none; }
 }
 
+/* Keep the long photo archive light while scrolling on mobile GPUs. */
+.memories-scene .garden-shadow,
+.memories-scene .opening-atmosphere span,
+.memories-scene .opening-floral { animation:none; }
+.memories-scene .opening-florals,
+.memories-scene .opening-atmosphere,
+.memories-scene .memory-card { will-change:auto; }
+.memories-scene .memory-card .story-image { transform:none; }
+
+/* Keep the opening scene at a stable screen height while the iOS keyboard opens. */
+.opening-scene { height:100svh; }
+.question-card {
+  top:calc(var(--story-viewport-top,0px) + var(--story-viewport-height,100dvh) / 2);
+  max-height:calc(var(--story-viewport-height,100dvh) - 1.5rem);
+}
+
 /* Photo archive: let the photographs lead on narrow phone screens. */
 @media (max-width:560px) {
   .memories-scene .memory-cloud { gap:2.1rem; padding-inline:.15rem; }
@@ -1037,24 +1054,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .music-control.is-expanded .music-float { transform:translateX(calc(-1 * (min(352px,calc(100vw - 2rem)) - 72px))) translateY(6px) scale(1.1); }
 }
 
-/* Page 05 — a layered garden with depth and a quiet section progress marker. */
-.memories-scene .botanical-backdrop { perspective:1200px; transform-style:preserve-3d; }
-.memories-scene .opening-atmosphere,.memories-scene .opening-florals { transform-style:preserve-3d; will-change:transform; }
-.memories-scene .opening-atmosphere span { filter:blur(65px); opacity:.48; }
-.memories-scene .opening-floral { filter:blur(var(--blur)) drop-shadow(0 18px 18px rgba(71,54,45,.2)); backface-visibility:hidden; }
-.memories-scene .memory-cloud { transform-style:preserve-3d; }
-.memories-scene .memory-card { transform-style:preserve-3d; backface-visibility:hidden; will-change:transform,opacity; transition:box-shadow .55s ease,filter .55s ease; }
-.memories-scene .memory-card .story-image { transform:translateZ(16px); box-shadow:0 14px 32px #342b2020; }
-.memories-scene .memory-card>div:last-child { transform:translateZ(28px); }
+/* Page 05 — a calm garden backdrop behind the photo archive. */
+.memories-scene .opening-atmosphere span { filter:blur(42px); opacity:.4; }
+.memories-scene .opening-floral { filter:blur(var(--blur)) drop-shadow(0 8px 10px rgba(71,54,45,.12)); }
+.memories-scene .memory-card .story-image { box-shadow:0 14px 32px #342b2020; }
 .memories-scene .memory-card:focus-visible { outline:2px solid #765657; outline-offset:6px; }
-.memory-progress { position:fixed; z-index:30; top:50%; right:clamp(1rem,3vw,2.4rem); display:grid; justify-items:center; gap:.55rem; color:#65584b; pointer-events:none; opacity:.85; transform:translateY(-50%); animation:memoryProgressIn .45s ease both; }
-@keyframes memoryProgressIn { from { opacity:0; transform:translate(8px,-50%); } }
-.memory-progress-label { font-size:.46rem; line-height:1.55; letter-spacing:.17em; text-align:center; writing-mode:vertical-rl; rotate:180deg; }
-.memory-progress-track { position:relative; display:block; width:2px; height:76px; overflow:hidden; border-radius:2px; background:#6a5a4830; }
-.memory-progress-track i { position:absolute; inset:0; display:block; border-radius:inherit; background:#745356; transform:scaleY(0); transform-origin:top center; transition:transform .12s linear; }
-.memory-progress-count { font-size:.48rem; letter-spacing:.08em; font-variant-numeric:tabular-nums; writing-mode:vertical-rl; rotate:180deg; }
-@media (max-width:560px) {
-  .memory-progress { right:.6rem; gap:.4rem; }
-  .memory-progress-track { height:58px; }
-  .memory-progress-label,.memory-progress-count { font-size:.4rem; }
-}

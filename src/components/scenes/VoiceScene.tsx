@@ -70,7 +70,7 @@ export function VoiceScene({ source = "/audio/voice-preview.wav", sample = true 
     <BotanicalBackdrop />
     <div className="section-heading centered voice-content">
       <p className="eyebrow">07 / LISTEN</p>
-      <h2>A Few Words<br />From Me</h2>
+      <h2><span className="scene-title-line">A Few Words</span><span className="scene-title-line">From Me</span></h2>
       <p className="voice-subtitle">Press play and listen to my heart.</p>
       <div className="story-ornament" aria-hidden="true"><span />✦<span /></div>
       <audio ref={audioRef} src={source} preload="metadata"

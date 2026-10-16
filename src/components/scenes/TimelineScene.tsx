@@ -51,7 +51,7 @@ export function TimelineScene() {
     <section className="scene timeline-scene" data-scene="4" id="journey" ref={root}>
       <div className="section-heading centered journey-heading">
         <p className="eyebrow">04 / THE PLACES OUR STORY TOUCHED</p>
-        <h2>Our Journey<br />Across The Map</h2>
+        <h2><span className="scene-title-line">Our Journey</span><span className="scene-title-line">Across The Map</span></h2>
         <p>Separate trips. Shared chapters. One growing story.</p>
       </div>
 

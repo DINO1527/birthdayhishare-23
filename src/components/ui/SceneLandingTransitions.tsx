@@ -3,12 +3,9 @@
 import { useEffect } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-const reveals = [
-  // These sections do not own a GSAP entrance timeline. Keep the reveal
-  // targets distinct from the hero, letter, and finale animations to avoid
-  // competing transforms when a scene enters the viewport.
-  "#story-map .map-story-intro", "#journey .journey-heading",
-  "#journey .journey-map-frame", "#memories .section-heading", "#reasons .section-heading",
+const staggeredHeadings = [
+  "#opening .opening-copy", "#hero .hero-copy", "#story-map .map-story-intro",
+  "#journey .journey-heading", "#memories .section-heading", "#reasons .section-heading",
   "#voice .voice-content",
 ];
 
@@ -22,16 +19,38 @@ export function SceneLandingTransitions() {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
         observer.unobserve(entry.target);
-        animations.push(entry.target.animate([
-          { opacity: 0.35, transform: "translate3d(0, 20px, 0)" },
-          { opacity: 1, transform: "translate3d(0, 0, 0)" },
-        ], { duration: 680, easing: "cubic-bezier(.2,.7,.25,1)" }));
+        const items = Array.from(entry.target.children).filter((element): element is HTMLElement =>
+          element instanceof HTMLElement && element.matches(".eyebrow, h1, h2, h3, .hero-sub, .voice-subtitle"),
+        );
+        if (!items.length) {
+          animations.push(entry.target.animate([
+            { opacity: 0.35, transform: "translate3d(0, 20px, 0)" },
+            { opacity: 1, transform: "translate3d(0, 0, 0)" },
+          ], { duration: 680, easing: "cubic-bezier(.2,.7,.25,1)" }));
+          continue;
+        }
+        let order = 0;
+        for (const item of items) {
+          const lines = item.matches("h1, h2, h3")
+            ? Array.from(item.querySelectorAll<HTMLElement>(":scope > .scene-title-line"))
+            : [];
+          const targets = lines.length ? lines : [item];
+          for (const target of targets) {
+            animations.push(target.animate([
+              { opacity: 0.2, transform: "translate3d(0, 22px, 0)" },
+              { opacity: 1, transform: "translate3d(0, 0, 0)" },
+            ], { duration: 650, delay: order * 115, easing: "cubic-bezier(.2,.7,.25,1)" }));
+            order++;
+          }
+        }
       }
     }, { rootMargin: "0px 0px -12% 0px", threshold: 0.01 });
-    for (const selector of reveals) {
+    for (const selector of staggeredHeadings) {
       const element = document.querySelector(selector);
       if (element) observer.observe(element);
     }
+    const mapFrame = document.querySelector<HTMLElement>("#journey .journey-map-frame");
+    if (mapFrame) observer.observe(mapFrame);
 
     const sections = Array.from(document.querySelectorAll<HTMLElement>(".scene:not(.opening-scene)"));
     let frame = 0;

@@ -31,7 +31,7 @@ export function LoveReasonsScene() {
       <BotanicalBackdrop />
       <div className="section-heading centered">
         <p className="eyebrow">06 / JUST YOU</p>
-        <h2>Things I Love<br />About You</h2>
+        <h2><span className="scene-title-line">Things I Love</span><span className="scene-title-line">About You</span></h2>
         <p>A few reasons you make my world brighter.</p>
       </div>
 

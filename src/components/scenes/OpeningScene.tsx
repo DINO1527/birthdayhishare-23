@@ -11,13 +11,11 @@ import { ScrollTrigger } from "@/lib/animation";
 type EntrancePhase = "checking" | "sealed" | "question" | "unlocking" | "loading" | "unlocked";
 type LoadingGameStep = "intro" | "love" | "love-no1" | "love-no2" | "love-yes" | "marry" | "marry-no" | "proposal-confirm" | "family" | "family-no" | "family-yes" | "commitment" | "won";
 const blockedKeys = new Set(["ArrowDown", "ArrowUp", "PageDown", "PageUp", "End", "Home", " "]);
+// Warm only the first images before the story opens. Later scenes use lazy
+// images; eagerly decoding the whole archive can exhaust memory on older phones.
 const photos = [...new Set([
   "/api/story-photo/hero/couple-hero.webp",
   "/api/story-photo/story/paths-crossed.webp",
-  ...journeyLocations.map((item) => item.image),
-  ...memories.map((item) => item.image),
-  ...loveReasons.map((item) => item.image),
-  "/api/story-photo/ending/final-couple.webp",
 ])];
 
 export function OpeningScene() {
@@ -53,14 +51,21 @@ export function OpeningScene() {
         "--story-viewport-height",
         `${Math.round(viewport?.height ?? window.innerHeight)}px`,
       );
+      document.documentElement.style.setProperty(
+        "--story-viewport-top",
+        `${Math.round(viewport?.offsetTop ?? 0)}px`,
+      );
     };
     syncViewport();
     viewport?.addEventListener("resize", syncViewport);
+    viewport?.addEventListener("scroll", syncViewport);
     window.addEventListener("resize", syncViewport);
     return () => {
       viewport?.removeEventListener("resize", syncViewport);
+      viewport?.removeEventListener("scroll", syncViewport);
       window.removeEventListener("resize", syncViewport);
       document.documentElement.style.removeProperty("--story-viewport-height");
+      document.documentElement.style.removeProperty("--story-viewport-top");
     };
   }, []);
 
@@ -223,17 +228,17 @@ export function OpeningScene() {
       <BotanicalBackdrop />
       <div className="opening-copy">
         <p className="eyebrow">01 / FOR YOU</p>
-        <h1>For You</h1>
+        <h1><span className="scene-title-line">For You</span></h1>
         <p>A small piece of our story.</p>
       </div>
-      <div className="envelope-stage" aria-hidden="true">
+      {phase !== "unlocked" && <div className="envelope-stage" aria-hidden="true">
         <Canvas camera={{ position: [0, 0.65, 7.8], fov: 36 }} dpr={[1, 1.55]} shadows>
           <ambientLight intensity={1.2} />
           <directionalLight position={[4, 6, 6]} intensity={1.8} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005} />
           <Envelope3D stage={phase === "checking" ? "sealed" : phase} />
           <ContactShadows position={[0, -1.55, 0]} opacity={0.16} scale={7} blur={2.4} />
         </Canvas>
-      </div>
+      </div>}
       {phase === "sealed" && <button type="button" className="primary-pill entrance-open" onClick={beginEntrance}>Open <span aria-hidden="true">→</span></button>}
       {phase === "checking" && <p className="entrance-checking" role="status">Preparing your story…</p>}
       {phase === "question" && (
