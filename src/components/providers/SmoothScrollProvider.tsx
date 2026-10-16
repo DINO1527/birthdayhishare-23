@@ -16,7 +16,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       duration: 0.8,
       smoothWheel: true,
       syncTouch: false,
-      prevent: (node) => Boolean(node.closest(".memory-lightbox-card, .final-modal, input")),
+      prevent: (node) => Boolean(node.closest(".memory-lightbox-card, .final-modal, .letter-copy, input")),
     });
 
     lenis.on("scroll", ScrollTrigger.update);

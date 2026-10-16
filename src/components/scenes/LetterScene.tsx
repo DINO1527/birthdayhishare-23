@@ -49,8 +49,16 @@ export function LetterScene() {
         <div className="letter-pin letter-pin-bottom" aria-hidden="true"><i /><i /><i /><i /><i /><b /><span /></div>
         <p className="eyebrow">08 / A BIRTHDAY LETTER</p>
         <div className="letter-heading"><span className="letter-stamp" aria-hidden="true">♡</span><h2>For You</h2></div>
-        <div className="letter-copy">
-          <p className="letter-paragraph"><strong>Happy Birthday, my love.</strong> When I think of us, I remember the quiet moments as much as the big ones: conversations over tea, the sea beside us, and roads that somehow kept leading us back to each other. Even the hard goodbyes remind me how deeply I care. Wherever this next year takes us, I hope you feel as loved as you make me feel. Thank you for being exactly you. I would choose our ordinary days, our adventures, and every beginning all over again.</p>
+        <div className="letter-copy" role="region" tabIndex={0} aria-label="Scrollable birthday letter">
+          <p className="letter-paragraph"><strong>Happy Birthday, my love.</strong> Happy Birthday, My Precious Pattu Ma! 🎂💖✨</p>
+          <p className="letter-paragraph">You are the absolute gem of my life and the love of my whole world! 💎 You know how people say the sunrise is beautiful? It really is, because my girl came into my life like a bright new day. 🌅</p>
+          <p className="letter-paragraph">En irundhu pona vaazhkaiyil oli eathi vacha en kuthu vilakku... ena maayam senju ena thookuna di! ✨</p>
+          <p className="letter-paragraph">Theoretically, practically, and honestly speaking, I am never the type of person to fall into this kind of love so suddenly. But what kind of magic did you cast on me? How did I fall so deeply in love with you? You completely spellbound me with those gorgeous eyes... 👀💫</p>
+          <p className="letter-paragraph">You are my best part, my absolute everything. Even if you weren&apos;t my very first love, true and unconditional love is something I only experienced after I found my Pattu. What a truly beautiful life this is with you! Through all my ups and downs, you have stood by me as the most perfect, comforting, and ultimate companion. 👩‍❤️‍👨</p>
+          <p className="letter-paragraph">I am so proud of you, I am jealous of you, and I am completely crazy about you! 🤪 You are such a glorious, breathtaking person. Happy Birthday to the absolute love of my life, my precious angel! From the moment you walked into my world, you transformed ordinary days into pure magic. Today, I just want to remind you how deeply and hopelessly addicted I am to every single detail of you. 🪄👑</p>
+          <p className="letter-paragraph">Unnodaiya pure heart, unoda ultimate love, and the deep respect you show me leave me breathless—you love me so unconditionally that even I feel I can never match the beauty of your soul. Unoda gorgeous eyes, unoda soft hair, that mesmerising smile, unoda cute childlike nature, and unoda angelic kindness... every single part of you makes me fall in love with you all over again, every single second! 🌸🌷</p>
+          <p className="letter-paragraph">Nee en vaazhkaiyil vandha dheyvadhai, en home, en peace, and en entire universe. 🏡🕊️ On this special day, I promise to protect that innocent child inside you, cherish your gentle heart forever, and adore you more with each passing breath.</p>
+          <p className="letter-paragraph">Happy Birthday, my beautiful queen-may your life be as radiant, sweet, and breathtaking as the love you give me every single day! 💖👑 Infinity love you, my everything! ♾️❤️</p>
           <p className="letter-signature letter-paragraph">Always yours,<span aria-hidden="true"> ♡</span></p>
         </div>
       </div>

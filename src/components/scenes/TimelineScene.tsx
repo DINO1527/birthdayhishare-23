@@ -61,7 +61,7 @@ export function TimelineScene() {
             <TravelMap activeIndex={activeIndex} />
             <div className="journey-active-name"><span>{String(activeIndex + 1).padStart(2, "0")}</span><b>{journeyLocations[activeIndex].name}</b></div>
             <p className="journey-map-note">A memory map — not one literal road trip.</p>
-            <a className="travel-map-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
+            <a className="travel-map-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer"></a>
           </div>
           <div className="travel-progress" aria-label={`Travel memory ${activeIndex + 1} of ${journeyLocations.length}`}><span style={{ width: `${((activeIndex + 1) / journeyLocations.length) * 100}%` }} /></div>
         </div>

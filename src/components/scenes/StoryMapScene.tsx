@@ -28,7 +28,7 @@ export function StoryMapScene() {
           <StoryImage src="/api/story-photo/story/paths-crossed.webp" alt="Couple photograph emerging from the Batticaloa map" label="OUR PATHS CROSSED" sizes="(max-width: 900px) 72vw, 340px" />
           <p className="eyebrow">DIFFERENT BEGINNINGS. ONE STORY.</p>
         </div>
-        <a className="origin-map-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
+        <a className="origin-map-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer"></a>
       </div>
     </section>
   );
